@@ -26,4 +26,4 @@ export default function AuthFooter({ mode }: AuthFooterProps) {
       )}
     </div>
   );
-}
+} 
