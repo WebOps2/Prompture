@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { EyeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import zxcvbn from 'zxcvbn';
 
 
 interface AuthCardProps {
@@ -73,6 +74,12 @@ export default function AuthCard({ mode }: AuthCardProps) {
       errors.confirmPassword = "Passwords do not match.";
       isValid = false;
     }
+    const results = zxcvbn(password);
+    if (results.score < 3) {
+      errors.password = "Password is too weak. Please use a stronger password.";
+      isValid = false;
+    }
+    
     setFieldErrors(errors);
     return isValid;
   };
