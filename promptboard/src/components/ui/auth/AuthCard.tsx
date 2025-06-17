@@ -75,7 +75,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
       isValid = false;
     }
     const results = zxcvbn(password);
-    if (results.score < 3) {
+    if (results.score < 3 && mode === "signup") {
       errors.password = "Password is too weak. Please use a stronger password.";
       isValid = false;
     }
