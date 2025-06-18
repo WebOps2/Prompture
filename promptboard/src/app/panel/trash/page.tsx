@@ -3,7 +3,7 @@
 import EmptyDashBoard from '@/app/EmptyDashboard';
 
 
-export default function Prompt() {
+export default function TrashPage() {
   return (
     <EmptyDashBoard />
   );
