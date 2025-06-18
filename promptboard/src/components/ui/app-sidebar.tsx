@@ -5,24 +5,24 @@ import { useEffect, useState } from "react";
 
 
 import {
-    FileText,
-    LayoutDashboard,
-    LogOut,
-    Trash2,
-    User,
-    UserCircle,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Trash2,
+  User,
+  UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
@@ -31,7 +31,7 @@ export function AppSidebar() {
     
       useEffect(() => {
         const fetchUser = async () => {
-          const { data, error } = await supabase.auth.getUser();
+          const { data } = await supabase.auth.getUser();
           if (data?.user) {
             const fullName = data.user.user_metadata.full_name;
             setUserName(fullName);

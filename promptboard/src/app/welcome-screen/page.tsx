@@ -4,32 +4,31 @@ import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import { BarChart3, Rocket, Sparkles } from 'lucide-react';
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Dashboard() {
     const router = useRouter();
-  const [userName, setUserName] = useState<string | null>(null);
+  // const [userName, setUserName] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
-        const fullName = data.user.user_metadata.full_name;
-        setUserName(fullName);
-      }
-    };
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     const { data, error } = await supabase.auth.getUser();
+  //     if (data?.user) {
+  //       const fullName = data.user.user_metadata.full_name;
+  //       setUserName(fullName);
+  //     }
+  //   };
+  //   const checkAuth = async () => {
+  //     const {
+  //       data: { session },
+  //     } = await supabase.auth.getSession();
 
-      if (!session) {
-        router.replace("/login");
-      }
-    };
-    checkAuth();
-    fetchUser();
-  }, []);
+  //     if (!session) {
+  //       router.replace("/login");
+  //     }
+  //   };
+  //   checkAuth();
+  //   fetchUser();
+  // }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
