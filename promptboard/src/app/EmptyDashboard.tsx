@@ -60,7 +60,7 @@ export default function EmptyDashBoard() {
 
       {/* CTA Section */}
       <div className="text-center space-y-4 mt-10 px-2">
-        <p className="text-gray-600">You haven't saved any prompts yet.</p>
+        <p className="text-gray-600">You haven&rsquo;t saved any prompts yet.</p>
 
         <div className="flex justify-center">
           <button className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
