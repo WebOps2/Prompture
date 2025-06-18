@@ -18,6 +18,16 @@ export default function Dashboard() {
         setUserName(fullName);
       }
     };
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.replace("/login");
+      }
+    };
+    checkAuth();
     fetchUser();
   }, []);
 
@@ -26,7 +36,7 @@ export default function Dashboard() {
     if (error) {
       console.error("Logout error:", error.message);
     } else {
-      router.push("/login");
+      router.replace("/login");
     }
   };
 
@@ -61,10 +71,10 @@ export default function Dashboard() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <button className="bg-white text-[#681da8] font-semibold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">
+          <button className="bg-white text-[#681da8] font-semibold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition" onClick={() => router.push("/panel/dashboard")}>
             Get Started
           </button>
-          <button className="bg-white/10 border border-white/30 font-semibold px-6 py-3 rounded-full text-white hover:bg-white/20 transition">
+          <button className="bg-white/10 border border-white/30 font-semibold px-6 py-3 rounded-full text-white hover:bg-white/20 transition" onClick={handleLogout}>
             Logout
           </button>
         </div>

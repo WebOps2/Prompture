@@ -130,7 +130,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
     if (error) setError(error.message);
     else {
-      router.push("/dashboard");
+      router.push("/welcome-screen");
     }
   }
 
