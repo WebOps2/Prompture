@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PromptBoard",
-  description: "Your AI prompt library and management tool",
+  title: "PromptBoard!",
+  description: "Your AI prompt library and management tool.",
 };
 
 export default function RootLayout({
