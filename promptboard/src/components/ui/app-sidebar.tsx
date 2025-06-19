@@ -71,7 +71,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="bg-white border-r w-64 h-full flex flex-col justify-between">
+    <Sidebar className="bg-white border-r w-64 h-full flex flex-col justify-between animate-in fade-in duration-400">
       <SidebarContent className="p-4 space-y-4">
         {/* Logo */}
         <div className="flex items-center gap-3 px-2">
@@ -109,7 +109,6 @@ export function AppSidebar() {
         <div className="flex items-center gap-2">
           <UserCircle className="w-6 h-6 text-gray-700" />
           <div className="text-sm leading-tight">
-            <div className="font-medium text-gray-800">{user}</div>
             <div className="font-medium text-gray-800">{user}</div>
             <div className="text-gray-500 text-xs">{email}</div>
           </div>

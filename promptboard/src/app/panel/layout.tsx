@@ -35,7 +35,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-screen overflow-hidden animate-in fade-in duration-300">
+      <div className="flex h-screen w-screen overflow-hidden animate-in fade-in duration-400">
         <AppSidebar />
 
         <main className="flex flex-col overflow-y-auto w-full">
