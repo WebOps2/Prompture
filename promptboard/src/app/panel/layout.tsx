@@ -31,6 +31,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }, []);
 
   if (!checked) return null; // Or a loading spinner
+  if (loading) return null; // Or a loading spinner
 
   return (
     <SidebarProvider>
