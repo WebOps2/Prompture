@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
-  const { user, loading } = useUser();
+  const { user} = useUser();
 
   useEffect(() => {
     const check = async () => {
@@ -31,7 +31,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }, []);
 
   if (!checked) return null; // Or a loading spinner
-  if (loading) return null; // Or a loading spinner
+  // if (loading) return null; // Or a loading spinner
 
   return (
     <SidebarProvider>

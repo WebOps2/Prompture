@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
-  const { user, email, loading } = useUser();
+  const { user, email} = useUser();
 
 
   useEffect(() => {
