@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* ✅ Manually force favicon */}
-        <link rel="icon" href="/favicon.ico" />
+        {/* <link rel="icon" href="promptboard/public/favicon.ico" type="image/x-icon" /> */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
