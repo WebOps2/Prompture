@@ -2,16 +2,16 @@
 
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import useUser from "@/hooks/use-user";
 import { supabase } from "@/lib/supabase-client";
 import { Moon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import fetchUser from "../userFetch";
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
-  const [name, setName] = useState<string | null>(null);
+  const { user, loading } = useUser();
 
   useEffect(() => {
     const check = async () => {
@@ -24,12 +24,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       } else {
         setChecked(true);
       }
-      const name = await fetchUser();
-      if (name) {
-        setName(name);
-      } else {
-        setName("User");
-      }
     };
     
 
@@ -37,6 +31,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }, []);
 
   if (!checked) return null; // Or a loading spinner
+  if (loading) return null; // Or a loading spinner
 
   return (
     <SidebarProvider>
@@ -51,7 +46,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <SidebarTrigger />
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 whitespace-nowrap">
-                  Hi {name} <span>👋</span>
+                  Hi {user} <span>👋</span>
                 </h1>
                 <p className="text-muted-foreground text-sm truncate">
                   Welcome to your prompt dashboard

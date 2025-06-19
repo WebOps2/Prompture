@@ -1,7 +1,8 @@
 // components/app-sidebar.tsx
+import useUser from "@/hooks/use-user"; // Assuming you have a custom hook for user data
 import { supabase } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 
 import {
@@ -26,34 +27,22 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
-    const [userName, setUserName] = useState<string | null>(null);
-    const [email, setEmail] = useState<string | null>(null);
-    
-      useEffect(() => {
-        const fetchUser = async () => {
-          const { data } = await supabase.auth.getUser();
-          if (data?.user) {
-            const fullName = data.user.user_metadata.full_name;
-            setUserName(fullName);
-          }
-          const email = data?.user?.email || ""
-          if (email){
-            setEmail(email);
-          }
-        };
-        const checkAuth = async () => {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-    
-          if (!session) {
-            router.replace("/login");
-          }
-        };
-        checkAuth();
-        fetchUser();
-      }, []);
-    const router = useRouter();
+    // const [userName, setUserName] = useState<string | null>(null);
+    // const [email, setEmail] = useState<string | null>(null);
+  const { user, email, loading } = useUser();
+  const router = useRouter();                
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) router.replace("/login");
+    };
+    checkAuth();
+  }, []);
+
+  if (loading) return null;
   const items = [
     {
       title: "Dashboard",
@@ -120,7 +109,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2">
           <UserCircle className="w-6 h-6 text-gray-700" />
           <div className="text-sm leading-tight">
-            <div className="font-medium text-gray-800">{userName}</div>
+            <div className="font-medium text-gray-800">{user}</div>
             <div className="text-gray-500 text-xs">{email}</div>
           </div>
         </div>
