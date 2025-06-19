@@ -45,7 +45,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
         <main className="flex flex-col overflow-y-auto w-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 w-full">
+          <div className="flex justify-between px-4 sm:px-6 py-4 border-b border-gray-200 w-full">
             {/* Left: SidebarTrigger + Greeting */}
             <div className="flex items-center gap-3 min-w-0">
               <SidebarTrigger />
