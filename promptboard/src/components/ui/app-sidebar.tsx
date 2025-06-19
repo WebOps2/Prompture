@@ -1,9 +1,7 @@
-// components/app-sidebar.tsx
+"use client";
+
+import useUser from "@/hooks/use-user";
 import { supabase } from "@/lib/supabase-client";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-
 import {
   FileText,
   LayoutDashboard,
@@ -13,6 +11,8 @@ import {
   UserCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import {
   Sidebar,
@@ -26,34 +26,22 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
-    const [userName, setUserName] = useState<string | null>(null);
-    const [email, setEmail] = useState<string | null>(null);
-    
-      useEffect(() => {
-        const fetchUser = async () => {
-          const { data } = await supabase.auth.getUser();
-          if (data?.user) {
-            const fullName = data.user.user_metadata.full_name;
-            setUserName(fullName);
-          }
-          const email = data?.user?.email || ""
-          if (email){
-            setEmail(email);
-          }
-        };
-        const checkAuth = async () => {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-    
-          if (!session) {
-            router.replace("/login");
-          }
-        };
-        checkAuth();
-        fetchUser();
-      }, []);
-    const router = useRouter();
+  const { user, email, loading } = useUser();
+
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace("/login");
+      }
+    };
+    checkAuth();
+  }, []);
+  const router = useRouter();
+
   const items = [
     {
       title: "Dashboard",
@@ -76,13 +64,14 @@ export function AppSidebar() {
       icon: User,
     },
   ];
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.replace("/login");
   };
 
   return (
-    <Sidebar className="bg-white border-r h-full flex flex-col justify-between">
+    <Sidebar className="bg-white border-r w-64 h-full flex flex-col justify-between">
       <SidebarContent className="p-4 space-y-4">
         {/* Logo */}
         <div className="flex items-center gap-3 px-2">
@@ -120,12 +109,12 @@ export function AppSidebar() {
         <div className="flex items-center gap-2">
           <UserCircle className="w-6 h-6 text-gray-700" />
           <div className="text-sm leading-tight">
-            <div className="font-medium text-gray-800">{userName}</div>
+            <div className="font-medium text-gray-800">{user}</div>
             <div className="text-gray-500 text-xs">{email}</div>
           </div>
         </div>
-        <button className="text-gray-500 hover:text-red-500 transition">
-          <LogOut className="w-5 h-5" onClick={handleLogout} />
+        <button className="text-gray-500 hover:text-red-500 transition" onClick={handleLogout}>
+          <LogOut className="w-5 h-5" />
         </button>
       </div>
     </Sidebar>
