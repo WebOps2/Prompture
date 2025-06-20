@@ -11,9 +11,24 @@ import { useEffect, useState } from "react";
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
-  const { user} = useUser();
+  const { user, loading} = useUser();
+  const AUTO_LOGOUT_MS = 60 * 1000  
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    const updateLastActive = () => {
+      localStorage.setItem("lastActivity", Date.now().toString());
+       if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const lastActivity = localStorage.getItem("lastActivity");
+        if (lastActivity && Date.now() - parseInt(lastActivity) > AUTO_LOGOUT_MS) {
+          supabase.auth.signOut();
+          router.replace("/login");
+        }
+      }, AUTO_LOGOUT_MS);
+
+    }
     const check = async () => {
       const {
         data: { session },
@@ -25,9 +40,20 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         setChecked(true);
       }
     };
+    check();
+    const events = ["click", "touchstart", "keydown", "mousemove", "scroll"];
+    events.forEach((event) => {
+      window.addEventListener(event, updateLastActive);
+    })
+    updateLastActive(); // Initial call to set last activity
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      events.forEach((event) => {
+        window.removeEventListener(event, updateLastActive);
+      });
+    };
     
 
-    check();
   }, []);
 
   if (!checked) return null; // Or a loading spinner

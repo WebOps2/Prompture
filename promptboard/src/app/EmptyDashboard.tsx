@@ -10,7 +10,7 @@ export default function EmptyDashBoard() {
     initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-    className="text-center space-y-10 max-w-3xl mx-auto px-4 sm:px-6 mt-10">
+    className="text-center space-y-10 max-w-3xl mx-auto px-4 sm:px-6 mt-10 animate-in fade-in duration-400">
       {/* PromptBoard Icon */}
       <div className="flex justify-center">
         <div className="bg-gradient-to-br from-violet-500 to-purple-500 p-4 rounded-2xl text-white relative">

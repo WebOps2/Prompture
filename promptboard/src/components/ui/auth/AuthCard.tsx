@@ -134,7 +134,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
     }
   }
 
-  setLoading(false);
+  // setLoading(false);
 };
 
   return (
