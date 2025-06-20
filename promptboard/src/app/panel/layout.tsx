@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
-  const { user, loading} = useUser();
+  const { user} = useUser();
   const AUTO_LOGOUT_MS = 60 * 1000  
 
   useEffect(() => {
