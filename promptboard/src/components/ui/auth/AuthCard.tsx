@@ -134,7 +134,10 @@ export default function AuthCard({ mode }: AuthCardProps) {
     }
   }
 
-  // setLoading(false);
+  if (mode === "signup") {
+    // Redirect to welcome screen or dashboard after successful signup
+    setLoading(false);
+  }
 };
 
   return (

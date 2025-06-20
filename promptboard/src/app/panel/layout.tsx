@@ -19,7 +19,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
     const updateLastActive = () => {
       localStorage.setItem("lastActivity", Date.now().toString());
-       if (timeout) clearTimeout(timeout);
+      if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
         const lastActivity = localStorage.getItem("lastActivity");
         if (lastActivity && Date.now() - parseInt(lastActivity) > AUTO_LOGOUT_MS) {
