@@ -12,7 +12,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const { user} = useUser();
-  const AUTO_LOGOUT_MS = 60 * 1000  
+  const AUTO_LOGOUT_MS = 60 * 60 * 1000  
 
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;
