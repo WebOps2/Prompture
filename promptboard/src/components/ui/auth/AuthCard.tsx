@@ -133,17 +133,15 @@ export default function AuthCard({ mode }: AuthCardProps) {
       console.log("Signing user in:", { email });
 
     // 👇 Get the session token
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    if (token && typeof window !== "undefined" && "chrome" in window) {
-      chrome.storage?.local.set({ jwt: token }, () => {
-        console.log("[PromptBoard] ✅ JWT stored for extension");
-      });
-      console.log("[PromptBoard] ✅ JWT stored for extension:", token);
-    }else{
-      console.error("[PromptBoard] ❌ Failed to store JWT for extension. Token is undefined or window.chrome is not available.");
-    }
-      console.log("User signed in successfully");
+    // const { data: { session } } = await supabase.auth.getSession();
+    // const token = session?.access_token;
+    const dataToSend = { message: "Hello from Next.js!" };
+    chrome.runtime.sendMessage({ type: "from_nextjs", data: dataToSend }, (response: any) => {
+      if (response) {
+        console.log("Response from extension:", response);
+      }
+    });
+      // console.log("User signed in successfully");
       router.push("/welcome-screen");
     }
   }
