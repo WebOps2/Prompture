@@ -142,6 +142,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
     }else{
       console.error("[PromptBoard] ❌ Failed to store JWT for extension. Token is undefined or window.chrome is not available.");
     }
+      console.log("User signed in successfully");
       router.push("/welcome-screen");
     }
   }
