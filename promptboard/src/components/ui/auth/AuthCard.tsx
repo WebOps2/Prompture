@@ -139,6 +139,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
       chrome.storage?.local.set({ jwt: token }, () => {
         console.log("[PromptBoard] ✅ JWT stored for extension");
       });
+      console.log("[PromptBoard] ✅ JWT stored for extension:", token);
     }else{
       console.error("[PromptBoard] ❌ Failed to store JWT for extension. Token is undefined or window.chrome is not available.");
     }
