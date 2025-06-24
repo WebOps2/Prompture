@@ -135,12 +135,21 @@ export default function AuthCard({ mode }: AuthCardProps) {
     // 👇 Get the session token
     // const { data: { session } } = await supabase.auth.getSession();
     // const token = session?.access_token;
-    window.postMessage({
-  source: "promptboard-app",
-  type: "PROMPT_SUBMIT",
-  payload: { prompt: "Hello from Next.js!" }
-}, "*");
+    const session = await supabase.auth.getSession();
 
+    if (session.data.session) {
+      const token = session.data.session.access_token;
+      const userId = session.data.session.user.id;
+
+      window.postMessage({
+        source: "promptboard-app",
+        type: "AUTH_DATA",
+        payload: {
+          token,
+          userId
+        }
+      }, "*");
+    }
       // console.log("User signed in successfully");
       router.push("/welcome-screen");
     }
