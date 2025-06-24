@@ -130,6 +130,16 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
     if (error) setError(error.message);
     else {
+      console.log("Signing user in:", { email });
+
+    // 👇 Get the session token
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (token && typeof window !== "undefined" && "chrome" in window) {
+      chrome.storage?.local.set({ jwt: token }, () => {
+        console.log("[PromptBoard] ✅ JWT stored for extension");
+      });
+    }
       router.push("/welcome-screen");
     }
   }
