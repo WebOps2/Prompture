@@ -136,7 +136,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
     // const { data: { session } } = await supabase.auth.getSession();
     // const token = session?.access_token;
     const dataToSend = { message: "Hello from Next.js!" };
-    chrome.runtime.sendMessage({ type: "from_nextjs", data: dataToSend }, (response: any) => {
+    chrome.runtime.sendMessage({ type: "from_nextjs", data: dataToSend }, (response: unknown) => {
       if (response) {
         console.log("Response from extension:", response);
       }
