@@ -13,7 +13,14 @@ import { supabase } from '@/lib/supabase-client';
 import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useState } from 'react';
 
-
+// type Prompt = {
+//   id: string;
+//   prompt: string;
+//   timestamp: string;
+//   site: string;
+//   tags?: string[];
+//   title?: string;
+// };
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -21,7 +28,7 @@ export default function DashboardPage() {
   const [selectedDay, setSelectedDay] = useState("All");
   const [selectedPlatform, setSelectedPlatform] = useState("All");
   // const [selectedTag, setSelectedTag] = useState("All");
-  const [prompts, setPrompts] = useState<any[]>([]);
+  const [prompts, setPrompts] = useState<{ timestamp: string }[]>([]);
   const days = ["All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const platforms = ["All", "chat.openai.com", "claude.ai", "bard.google.com", "poe.com"];
   const popularTags = ["research", "code", "personal", "debug", "idea"];
@@ -39,7 +46,7 @@ export default function DashboardPage() {
 
   const timeRanges = ["All Time", "Today", "This Week", "This Month"];
 
-  const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
+  // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
 
 
   useEffect(() => {
