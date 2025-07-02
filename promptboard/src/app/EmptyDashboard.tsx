@@ -22,7 +22,7 @@ export default function EmptyDashBoard() {
       {/* Headings */}
       <div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900">
-          Welcome to PromptBoardss
+          Welcome to PromptBoard
         </h1>
         <p className="text-base sm:text-lg text-muted-foreground mt-2">
           Your AI Prompt Management Hub
