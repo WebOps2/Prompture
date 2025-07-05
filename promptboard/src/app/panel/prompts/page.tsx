@@ -2,6 +2,7 @@
 
 import EmptyDashBoard from '@/app/EmptyDashboard';
 import { Input } from "@/components/ui/input";
+import { PromptCard } from '@/components/ui/PromptCard/PromptCard';
 import {
   Select,
   SelectContent,
@@ -63,6 +64,7 @@ export default function DashboardPage() {
       .from("prompts")
       .select("*")
       .eq("user_id", user.id)
+      .order("timestamp", { ascending: false });
 
 
       if (error) {
@@ -153,7 +155,7 @@ export default function DashboardPage() {
     fetchPrompts();
     loadPromptDateMetadata();
     fetchTags();
-    // console.log(prompts)
+    // console.log(pro)
 
     
   }, []);
@@ -180,6 +182,8 @@ export default function DashboardPage() {
 
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
+
+    console.log("Filtered prompts:", filterPrompts);
 
 
   if (loading) {
@@ -210,7 +214,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Filters - Now Responsive */}
-      <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
         <Select value={selectedDay} onValueChange={setSelectedDay}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
@@ -303,6 +307,17 @@ export default function DashboardPage() {
       <p className="mt-4">
         <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
       </p>
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 mt-6">
+        {filterPrompts.length > 0 ? (
+          filterPrompts.map((prompt) => (
+            <PromptCard key={prompt.id} prompt={prompt} />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 dark:text-gray-400 col-span-full">
+            No prompts found for selected filters.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
