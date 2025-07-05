@@ -1,7 +1,16 @@
 "use client";
 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { CalendarDays, Eye, MoreHorizontal, Pencil, Star } from "lucide-react";
+import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
+
+import { useState } from "react";
+
 
 type Prompt = {
   id: string;
@@ -15,6 +24,23 @@ type Prompt = {
 };
 
 export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
+    const getPromptFontSize = (text: string) => {
+    const wordCount = text.trim().split(/\s+/).length;
+
+    if (wordCount <= 250) return "text-lg";       // short prompts
+    if (wordCount <= 1000) return "text-sm";         // medium prompts
+    return "text-base";                               // long prompts
+    };
+
+    const [expanded, setExpanded] = useState(false);
+
+    const MAX_LENGTH = 1000; // characters before truncation
+    const isLong = prompt.prompt.length > MAX_LENGTH;
+
+    const displayText = expanded || !isLong
+    ? prompt.prompt
+    : prompt.prompt.slice(0, MAX_LENGTH) + "...";
+
   return (
     <div className="relative group border rounded-2xl bg-white dark:bg-zinc-900 p-5 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md duration-200 ease-out">
       {/* View / More Icons */}
@@ -23,9 +49,36 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
           <Eye className="w-4 h-4" />
           <span className="text-sm">View</span>
         </div>
-        <button className="text-zinc-500 hover:text-zinc-700 dark:hover:text-white">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className="text-zinc-500 hover:text-zinc-700 dark:hover:text-white">
+                <MoreHorizontal className="w-5 h-5" />
+                </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem className="gap-2">
+                <Pencil className="w-4 h-4" />
+                Edit Prompt
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2">
+                <FilePlus2 className="w-4 h-4" />
+                Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2">
+                <Copy className="w-4 h-4" />
+                Copy Content
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2">
+                <Star className="w-4 h-4" />
+                Add to Favorites
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
+                <Trash2 className="w-4 h-4" />
+                Delete
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Source */}
@@ -53,12 +106,32 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
       </div>
 
       {/* Prompt Preview */}
-      <div className="bg-zinc-100 dark:bg-zinc-800 p-3 mt-4 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 line-clamp-3">
-        {prompt.prompt}
-        <span className="text-indigo-600 dark:text-indigo-400 ml-1 inline-flex items-center cursor-pointer hover:underline">
-          Read more <Eye className="w-4 h-4 ml-1" />
-        </span>
-      </div>
+      <div className={`bg-zinc-100 dark:bg-zinc-800 p-3 mt-4 rounded-xl ${getPromptFontSize(prompt.prompt)} text-zinc-800 dark:text-zinc-200 line-clamp-3`}>
+        {/* {prompt.prompt} */}
+        {/* <span className="text-indigo-600 dark:text-indigo-400 ml-1 inline-flex items-center cursor-pointer hover:underline">
+            Read more <Eye className="w-4 h-4 ml-1" />
+        </span> */}
+        <span>
+    {displayText}
+    {isLong && !expanded && (
+      <button
+        onClick={() => setExpanded(true)}
+        className="ml-1 text-indigo-600 dark:text-indigo-400 hover:underline"
+      >
+        Read more
+      </button>
+    )}
+    {isLong && expanded && (
+      <button
+        onClick={() => setExpanded(false)}
+        className="ml-2 text-indigo-600 dark:text-indigo-400 hover:underline"
+      >
+        View less
+      </button>
+    )}
+  </span>
+        
+    </div>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mt-4">
