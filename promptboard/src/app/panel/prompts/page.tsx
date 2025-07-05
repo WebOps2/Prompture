@@ -192,22 +192,27 @@ export default function DashboardPage() {
   console.log("User has prompts:", hasPrompts);
   // ✅ Inline Hello World view if user has prompts
   return (
-    <div className="space-y-2 ">
+    <div className="space-y-2">
       <h1 className="text-4xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-500 text-transparent bg-clip-text">
         Prompt Library
       </h1>
       <p className="text-muted-foreground text-base">
         Search, filter, and organize your saved AI prompts
       </p>
+
+      {/* Search Bar */}
       <div className="w-full max-w-4xl mx-auto mt-6">
-        <input
+        <Input
           type="text"
           placeholder="Search prompts by keywords, tags, or content..."
           className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
         />
-      <div className="w-full max-w-4xl mx-auto mt-4 flex flex-col sm:flex-row sm:items-center gap-4">
+      </div>
+
+      {/* Filters - Now Responsive */}
+      <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <Select value={selectedDay} onValueChange={setSelectedDay}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
           </SelectTrigger>
           <SelectContent>
@@ -218,8 +223,9 @@ export default function DashboardPage() {
             ))}
           </SelectContent>
         </Select>
+
         <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by platform" />
           </SelectTrigger>
           <SelectContent>
@@ -230,27 +236,23 @@ export default function DashboardPage() {
             ))}
           </SelectContent>
         </Select>
+
         <div className="flex flex-col gap-2">
-        {/* Select Popular Tag */}
           <Select value={selectedTag} onValueChange={(v) => {
             setSelectedTag(v);
             if (v !== "Other") setCustomTag("");
           }}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter by tag" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Tags</SelectItem>
               {popularTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
-                  {tag}
-                </SelectItem>
+                <SelectItem key={tag} value={tag}>{tag}</SelectItem>
               ))}
               <SelectItem value="Other">Other...</SelectItem>
             </SelectContent>
           </Select>
-
-          {/* Show Text Input if 'Other' is Selected */}
           {selectedTag === "Other" && (
             <Input
               type="text"
@@ -260,50 +262,47 @@ export default function DashboardPage() {
               className="text-sm"
             />
           )}
-      </div>
-      <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Filter by month" />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((month) => (
-            <SelectItem key={month} value={month}>
-              {month}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select value={selectedYear} onValueChange={setSelectedYear}>
-        <SelectTrigger className="w-32">
-          <SelectValue placeholder="Filter by year" />
-        </SelectTrigger>
-        <SelectContent>
-          {years.map((year) => (
-            <SelectItem key={year} value={year}>
-              {year}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select value={selectedRange} onValueChange={setSelectedRange}>
-        <SelectTrigger className="w-44 px-3 py-2 border border-gray-300 rounded-xl flex items-center justify-between text-sm font-medium">
-          <div className="flex items-center gap-2">
+        </div>
+
+        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Filter by month" />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((month) => (
+              <SelectItem key={month} value={month}>{month}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Filter by year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={year}>{year}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedRange} onValueChange={setSelectedRange}>
+          <SelectTrigger className="w-full gap-2">
             <CalendarDays className="w-4 h-4" />
             <SelectValue placeholder="All Time" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {timeRanges.map((range) => (
-            <SelectItem key={range} value={range}>
-              {range}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      
-    </div>
+          </SelectTrigger>
+          <SelectContent>
+            {timeRanges.map((range) => (
+              <SelectItem key={range} value={range}>{range}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <p><strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found</p>
+
+      {/* Prompt Count */}
+      <p className="mt-4">
+        <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
+      </p>
     </div>
   );
 }
