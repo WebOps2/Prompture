@@ -307,7 +307,7 @@ export default function DashboardPage() {
       <p className="mt-4">
         <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
       </p>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
         {filterPrompts.length > 0 ? (
           filterPrompts.map((prompt) => (
             <PromptCard key={prompt.id} prompt={prompt} />
