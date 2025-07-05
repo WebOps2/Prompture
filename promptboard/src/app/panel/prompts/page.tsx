@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase-client';
 import { CalendarDays } from "lucide-react";
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // type Prompt = {
 //   id: string;
@@ -25,20 +25,22 @@ import { useEffect, useMemo, useState } from 'react';
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [hasPrompts, setHasPrompts] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("All");
-  const [selectedPlatform, setSelectedPlatform] = useState("All");
+  const [selectedDay, setSelectedDay] = useState("All Days");
+  const [selectedPlatform, setSelectedPlatform] = useState("All Platforms");
   // const [selectedTag, setSelectedTag] = useState("All");
-  const [prompts, setPrompts] = useState<{ timestamp: string }[]>([]);
-  const days = ["All", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const platforms = ["All", "chat.openai.com", "claude.ai", "bard.google.com", "poe.com"];
-  const popularTags = ["research", "code", "personal", "debug", "idea"];
+  // const [prompts, setPrompts] = useState<{ timestamp: string }[]>([]);
+  const days = ["All Days", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  // const platforms = ["All Platforms", "chat.openai.com", "claude.ai", "bard.google.com", "poe.com"];
+  // const popularTags = ["research", "code", "personal", "debug", "idea"];
   const [selectedTag, setSelectedTag] = useState("All");
   const [customTag, setCustomTag] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("All");
-  const [selectedYear, setSelectedYear] = useState("All");
-
+  const [selectedMonth, setSelectedMonth] = useState("All Months");
+  const [selectedYear, setSelectedYear] = useState("All Years");
+  const [platforms, setPlatforms] = useState<string[]>(["All Platforms"]);
+  const [years, setYears] = useState<string[]>([]);
+  const [popularTags, setPopularTags] = useState<string[]>([]);
   const months = [
-  "All", "January", "February", "March", "April", "May", "June",
+  "All Months", "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
   ];
   // const years = ["All", "2023", "2024", "2025"]
@@ -59,9 +61,40 @@ export default function DashboardPage() {
     if (error) {
       console.error("❌ Failed to load timestamps:", error);
     } else {
-      setPrompts(data); // or setTimestamps(data)
+      const uniqueYears = Array.from(new Set(data.map((p) => new Date(p.timestamp).getFullYear().toString())));
+      setYears(["All Years", ...uniqueYears]); // or setTimestamps(data)
     }
   };
+  const fetchTags = async () => {
+      const { data, error } = await supabase.from("prompts").select("tags");
+
+      if (error) {
+        console.error("Error fetching tags:", error);
+        return;
+      }
+
+      const tagSet = new Set<string>();
+      data.forEach((row) => {
+        if (Array.isArray(row.tags)) {
+          row.tags.forEach((tag: string) => tagSet.add(tag));
+        }
+      });
+
+      setPopularTags(Array.from(tagSet));
+    };
+  const fetchPlatforms = async () => {
+      const { data, error } = await supabase
+        .from("prompts")
+        .select("source", { count: "exact", head: false });
+
+      if (error) {
+        console.error("Error fetching platforms:", error);
+        return;
+      }else{
+        const uniquePlatforms = Array.from(new Set(data.map((p) => p.source)));
+        setPlatforms(["All Platforms", ...uniquePlatforms]);
+      }
+    };
     const fetchPrompts = async () => {
       const {
         data: { user },
@@ -90,19 +123,21 @@ export default function DashboardPage() {
       setLoading(false);
     };
 
+    fetchPlatforms()
     fetchPrompts();
     loadPromptDateMetadata();
+    fetchTags();
     // console.log(prompts)
 
     
   }, []);
-  console.log("Prompts loaded:", prompts);
-  const years = useMemo(() => {
-  const allYears = prompts.map((p) =>
-    new Date(p.timestamp).getFullYear().toString()
-  );
-  return ["All", ...Array.from(new Set(allYears))];
-}, [prompts]);
+  // console.log("Prompts loaded:", prompts);
+//   const years = useMemo(() => {
+//   const allYears = prompts.map((p) =>
+//     new Date(p.timestamp).getFullYear().toString()
+//   );
+//   return ["All Years", ...Array.from(new Set(allYears))];
+// }, [prompts]);
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -162,7 +197,7 @@ export default function DashboardPage() {
               <SelectValue placeholder="Filter by tag" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="All">All Tags</SelectItem>
               {popularTags.map((tag) => (
                 <SelectItem key={tag} value={tag}>
                   {tag}
