@@ -13,14 +13,14 @@ import { supabase } from '@/lib/supabase-client';
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from 'react';
 
-// type Prompt = {
-//   id: string;
-//   prompt: string;
-//   timestamp: string;
-//   site: string;
-//   tags?: string[];
-//   title?: string;
-// };
+type Prompt = {
+  id: string;
+  prompt: string;
+  timestamp: string;
+  source: string;
+  tags?: string[];
+  title?: string;
+};
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -43,15 +43,35 @@ export default function DashboardPage() {
   "All Months", "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
   ];
+  // const [allPrompts, setAllPrompts] = useState<Prompt[]>([]);
   // const years = ["All", "2023", "2024", "2025"]
   const [selectedRange, setSelectedRange] = useState("All Time");
 
   const timeRanges = ["All Time", "Today", "This Week", "This Month"];
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
 
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
 
 
   useEffect(() => {
+    
+    const fetchAllPrompts = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+    const { data, error } = await supabase
+      .from("prompts")
+      .select("*")
+      .eq("user_id", user.id)
+
+
+      if (error) {
+      console.error("Error fetching prompts:", error);
+      return;
+    }
+    setPrompts(data);
+    }
+
     const loadPromptDateMetadata = async () => {
     const { data, error } = await supabase
       .from("prompts")
@@ -83,9 +103,14 @@ export default function DashboardPage() {
       setPopularTags(Array.from(tagSet));
     };
   const fetchPlatforms = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
       const { data, error } = await supabase
         .from("prompts")
-        .select("source", { count: "exact", head: false });
+        .select("source", { count: "exact", head: false })
+        .eq("user_id", user.id);
+
 
       if (error) {
         console.error("Error fetching platforms:", error);
@@ -123,6 +148,7 @@ export default function DashboardPage() {
       setLoading(false);
     };
 
+    fetchAllPrompts();
     fetchPlatforms()
     fetchPrompts();
     loadPromptDateMetadata();
@@ -138,6 +164,23 @@ export default function DashboardPage() {
 //   );
 //   return ["All Years", ...Array.from(new Set(allYears))];
 // }, [prompts]);
+  const filterPrompts = prompts.filter((prompt) => {
+      const matchesDay = selectedDay === "All Days" || new Date(prompt.timestamp).toLocaleString('en-US', { weekday: 'long' }) === selectedDay;
+      const matchesMonth = selectedMonth === "All Months" || new Date(prompt.timestamp).toLocaleString('en-US', { month: 'long' }) === selectedMonth;
+      const matchesYear = selectedYear === "All Years" || new Date(prompt.timestamp).getFullYear().toString() === selectedYear;
+      const matchesPlatform = selectedPlatform === "All Platforms" || prompt.source === selectedPlatform;
+      const matchesTag = selectedTag === "All" || (prompt.tags && prompt.tags.includes(selectedTag)) || (selectedTag === "Other" && customTag && prompt.tags && prompt.tags.includes(customTag));
+      const matchesRange = selectedRange === "All Time" ||
+        (selectedRange === "Today" && new Date(prompt.timestamp).toDateString() === new Date().toDateString()) ||
+        (selectedRange === "This Week" && 
+          new Date(prompt.timestamp).getTime() >= new Date(new Date().setDate(new Date().getDate() - new Date().getDay())).getTime() &&
+          new Date(prompt.timestamp).getTime() <= new Date().getTime()) ||  
+        (selectedRange === "This Month" && new Date(prompt.timestamp).getMonth() === new Date().getMonth() &&
+          new Date(prompt.timestamp).getFullYear() === new Date().getFullYear()); 
+
+      return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
+    })
+
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -149,7 +192,7 @@ export default function DashboardPage() {
   console.log("User has prompts:", hasPrompts);
   // ✅ Inline Hello World view if user has prompts
   return (
-    <div className="text-center space-y-2 ">
+    <div className="space-y-2 ">
       <h1 className="text-4xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-500 text-transparent bg-clip-text">
         Prompt Library
       </h1>
@@ -260,6 +303,7 @@ export default function DashboardPage() {
       
     </div>
       </div>
+      <p><strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found</p>
     </div>
   );
 }
