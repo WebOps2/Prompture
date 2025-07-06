@@ -1,15 +1,15 @@
 "use client";
 
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
 type Prompt = {
@@ -33,8 +33,27 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     };
 
     const [expanded, setExpanded] = useState(false);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const [showReadMore, setShowReadMore] = useState(false);
+    const [MAX_LENGTH, setMaxLength] = useState(100); // characters before truncation
+    useEffect(() => {
+    const updateLength = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setMaxLength(100); // Mobile
+      } else if (width < 1024) {
+        setMaxLength(800); // Tablet
+      } else {
+        setMaxLength(1000); // Desktop
+      }
+    };
 
-    const MAX_LENGTH = 1000; // characters before truncation
+    updateLength();
+    window.addEventListener("resize", updateLength);
+    return () => window.removeEventListener("resize", updateLength);
+  }, []);
+
+    // const MAX_LENGTH = 100; // characters before truncation
     const isLong = prompt.prompt.length > MAX_LENGTH;
 
     const displayText = expanded || !isLong
@@ -42,7 +61,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     : prompt.prompt.slice(0, MAX_LENGTH) + "...";
 
   return (
-    <div className="relative group border rounded-2xl bg-white dark:bg-zinc-900 p-5 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md duration-200 ease-out">
+    <div className="relative group border rounded-2xl bg-white dark:bg-zinc-900 p-5 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md duration-200 ease-out ">
       {/* View / More Icons */}
       <div className="absolute top-4 right-4 flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -87,7 +106,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
       </span>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mt-2">
+      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mt-2 ">
         {prompt.Title || "Untitled Prompt"}
       </h3>
 
@@ -106,7 +125,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
       </div>
 
       {/* Prompt Preview */}
-      <div className={`bg-zinc-100 dark:bg-zinc-800 p-3 mt-4 rounded-xl ${getPromptFontSize(prompt.prompt)} text-zinc-800 dark:text-zinc-200 line-clamp-3`}>
+      <div  className={`bg-zinc-100 dark:bg-zinc-800 p-3 mt-4 rounded-xl ${getPromptFontSize(prompt.prompt)} text-zinc-800 dark:text-zinc-200 whitespace-normal break-words `}>
         {/* {prompt.prompt} */}
         {/* <span className="text-indigo-600 dark:text-indigo-400 ml-1 inline-flex items-center cursor-pointer hover:underline">
             Read more <Eye className="w-4 h-4 ml-1" />
@@ -116,7 +135,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     {isLong && !expanded && (
       <button
         onClick={() => setExpanded(true)}
-        className="ml-1 text-indigo-600 dark:text-indigo-400 hover:underline"
+        className="ml-1 text-indigo-600 dark:text-indigo-400 hover:underline text-base"
       >
         Read more
       </button>
@@ -124,7 +143,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     {isLong && expanded && (
       <button
         onClick={() => setExpanded(false)}
-        className="ml-2 text-indigo-600 dark:text-indigo-400 hover:underline"
+        className="ml-2 text-indigo-600 dark:text-indigo-400 hover:underline text-base"
       >
         View less
       </button>
