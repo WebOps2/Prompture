@@ -9,7 +9,7 @@ import {
 import { format } from "date-fns";
 import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 type Prompt = {
@@ -33,8 +33,8 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     };
 
     const [expanded, setExpanded] = useState(false);
-    const contentRef = useRef<HTMLDivElement | null>(null);
-    const [showReadMore, setShowReadMore] = useState(false);
+    // const contentRef = useRef<HTMLDivElement | null>(null);
+    // const [showReadMore, setShowReadMore] = useState(false);
     const [MAX_LENGTH, setMaxLength] = useState(100); // characters before truncation
     useEffect(() => {
     const updateLength = () => {
