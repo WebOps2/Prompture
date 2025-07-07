@@ -128,7 +128,12 @@ export default function AuthCard({ mode }: AuthCardProps) {
 
     console.log("Signing user in:", { email });
 
-    if (error) setError(error.message);
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+
+    }
+
     else {
       console.log("Signing user in:", { email });
 

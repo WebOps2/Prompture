@@ -139,8 +139,8 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
                 <Copy className="w-4 h-4" />
                 Copy Content
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                <Star className={`w-4 h-4 ${prompt.favorite ? "fill-yellow-400 text-yellow-400" : "hover:text-yellow-400"}`} onClick={toggleFavorite}/>
+                <DropdownMenuItem className={`gap-2`} onClick={toggleFavorite}>
+                <Star className={`w-4 h-4 ${favorited ? "fill-yellow-400" : "hover:text-yellow-400"}`} onClick={toggleFavorite}/>
                 Add to Favorites
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
