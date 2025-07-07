@@ -21,7 +21,7 @@ type Prompt = {
   last_used?: string;
   tags?: string[];
   source: string;
-  favorited?: boolean;
+  favorite?: boolean;
 };
 
 export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
@@ -40,6 +40,8 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedPrompt, setEditedPrompt] = useState(prompt.prompt);
     const [localPrompt, setLocalPrompt] = useState(prompt.prompt);
+    const [favorited, setFavorited] = useState(prompt.favorite || false);
+    console.log(prompt.favorite, "favorited state");
 
     const handlePromptChange = (newText: string) => {
       setEditedPrompt(newText);
@@ -56,6 +58,21 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
         console.log("✅ Prompt updated!");
         setLocalPrompt(editedPrompt);   // update what displays
         setIsEditing(false);
+      }
+    };
+    const toggleFavorite = async () => {
+      const newValue = !favorited;
+
+      const { error } = await supabase
+        .from("prompts")
+        .update({ favorite: newValue })
+        .eq("id", prompt.id);
+
+      if (error) {
+        console.error("❌ Error updating favorite:", error);
+      } else {
+        console.log("✅ Favorite status updated!", newValue);
+        setFavorited(newValue);
       }
     };
     
@@ -86,7 +103,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
   return (
     <div className="relative group border rounded-2xl bg-white dark:bg-zinc-900 p-5 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md duration-200 ease-out ">
       {/* View / More Icons */}
-      <div className="absolute top-4 right-4 flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div className="absolute top-4 right-4 flex items-center gap-4 opacity-100 lg:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
         <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
           <Eye className="w-4 h-4" />
           <span className="text-sm">View</span>
@@ -123,7 +140,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
                 Copy Content
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2">
-                <Star className="w-4 h-4" />
+                <Star className={`w-4 h-4 ${prompt.favorite ? "fill-yellow-400 text-yellow-400" : "hover:text-yellow-400"}`} onClick={toggleFavorite}/>
                 Add to Favorites
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
@@ -232,10 +249,10 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
         <Pencil className="w-4 h-4 cursor-pointer hover:text-blue-500" onClick={() => setIsEditing(true)}/>
         <Star
           className={`w-4 h-4 cursor-pointer transition ${
-            prompt.favorited
-              ? "fill-yellow-400 text-yellow-400"
+            favorited
+              ? "fill-yellow-400"
               : "hover:text-yellow-400"
-          }`}
+          }`} onClick={toggleFavorite}
         />
       </div>
     </div>
