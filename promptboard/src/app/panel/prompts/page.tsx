@@ -372,10 +372,17 @@ export default function DashboardPage() {
 
           {/* Page numbers */}
           {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .slice(0, 6)
-            .map((page) => (
+          .filter((page) =>
+            page === 1 ||
+            page === totalPages ||
+            Math.abs(page - currentPages) <= 1
+          )
+          .map((page, index, arr) => (
+            <span key={page}>
+              {index > 0 && page - arr[index - 1] > 1 && (
+                <span className="px-2 py-1 text-gray-400 select-none">…</span>
+              )}
               <button
-                key={page}
                 onClick={() => handlePageChange(page)}
                 className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap ${
                   page === currentPages
@@ -385,7 +392,8 @@ export default function DashboardPage() {
               >
                 {page}
               </button>
-            ))}
+            </span>
+        ))}
 
           {/* Next button */}
           <button
