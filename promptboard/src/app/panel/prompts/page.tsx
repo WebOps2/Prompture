@@ -55,12 +55,7 @@ export default function DashboardPage() {
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
   const searchParams = useSearchParams();
-  // const currentPages = parseInt(searchParams.get("page") || "1", 10);
-  const [currentPages, setCurrentPages] = useState(1);
-  useEffect(() => {
-    const pageParam = parseInt(searchParams.get("page") || "1", 10);
-    setCurrentPages(pageParam);
-  }, [searchParams]);
+  const currentPages = parseInt(searchParams.get("page") || "1", 10);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -80,7 +75,8 @@ export default function DashboardPage() {
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
     const handlePageChange = (page: number) => {
-    router.replace(`/panel/prompts?page=${page}&refresh=${Date.now()}`);;
+    router.push(`/panel/prompts?page=${page}`);
+    router.refresh(); 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
