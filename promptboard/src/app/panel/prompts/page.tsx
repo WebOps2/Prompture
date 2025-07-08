@@ -355,37 +355,51 @@ export default function DashboardPage() {
           </p>
         )}
       </div>
-      <div className="flex justify-center items-center gap-2 mt-6 mb-4">
-        <button
-          onClick={() => 
-            handlePageChange(currentPages - 1)}
-          disabled={currentPages === 1}
-          className={`px-4 py-2 rounded ${currentPages === 1 ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-zinc-900 text-white hover:bg-zinc-700"}`}
-        >
-          Prev
-        </button>
-
-        {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 6).map((page) => (
+      <div className="w-full overflow-x-auto">
+        <div className="flex justify-center sm:justify-center items-center gap-2 mt-6 mb-4 px-2 min-w-fit">
+          {/* Prev button */}
           <button
-            key={page}
-            onClick={() => {handlePageChange(page)} }
-            className={`px-4 py-2 rounded ${
-              page === currentPages ? "bg-gradient-to-br from-violet-500 to-purple-500 text-white font-bold px-4 py-2 shadow-sm" : "bg-purple-100 text-purple-600 hover:bg-purple-200"
+            onClick={() => handlePageChange(currentPages - 1)}
+            disabled={currentPages === 1}
+            className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap ${
+              currentPages === 1
+                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                : "bg-zinc-900 text-white hover:bg-zinc-700"
             }`}
           >
-            {page}
+            Prev
           </button>
-        ))}
 
-        <button
-          onClick={() => handlePageChange(currentPages + 1)}
-          disabled={currentPages === totalPages}
-          className={`px-4 py-2 rounded ${
-            currentPages === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-violet-700 text-white hover:bg-violet-800"
-          }`}
-        >
-          Next
-        </button>
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .slice(0, 6)
+            .map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap ${
+                  page === currentPages
+                    ? "bg-gradient-to-br from-violet-500 to-purple-500 text-white font-bold shadow-sm"
+                    : "bg-purple-100 text-purple-600 hover:bg-purple-200"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+          {/* Next button */}
+          <button
+            onClick={() => handlePageChange(currentPages + 1)}
+            disabled={currentPages === totalPages}
+            className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap ${
+              currentPages === totalPages
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-violet-700 text-white hover:bg-violet-800"
+            }`}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
