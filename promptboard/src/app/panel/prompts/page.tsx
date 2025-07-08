@@ -51,7 +51,6 @@ export default function DashboardPage() {
 
   const timeRanges = ["All Time", "Today", "This Week", "This Month"];
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-  // const [currentPage, setCurrentPage] = useState(1);
   const promptsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
@@ -77,7 +76,7 @@ export default function DashboardPage() {
     })
     const handlePageChange = (page: number) => {
     router.push(`/panel/prompts?page=${page}`);
-    // window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
     const start = (currentPages - 1) * promptsPerPage;
