@@ -466,11 +466,9 @@ export default function DashboardPage() {
                 <button
                   onClick={() => handlePageChange(page)}
                   // disabled={navigationRef.current}
-                  className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap transition-all ${
+                 className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap transition-all ${
                     page === currentPages
                       ? "bg-gradient-to-br from-violet-500 to-purple-500 text-white font-bold shadow-sm"
-                      : navigationRef.current
-                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : "bg-purple-100 text-purple-600 hover:bg-purple-200"
                   }`}
                 >
