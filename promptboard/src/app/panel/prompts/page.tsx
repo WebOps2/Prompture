@@ -75,7 +75,7 @@ export default function DashboardPage() {
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
     const handlePageChange = (page: number) => {
-    router.push(`/panel/prompts?page=${page}`);
+    router.replace(`/panel/prompts?page=${page}&refresh=${Date.now()}`);;
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
