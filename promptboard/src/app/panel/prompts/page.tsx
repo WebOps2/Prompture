@@ -64,7 +64,7 @@ export default function DashboardPage() {
     if (page !== currentPages) {
       setCurrentPages(page);
     }
-  }, [searchParams, pathname]);
+  }, [searchParams, pathname, currentPages]);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -85,7 +85,7 @@ export default function DashboardPage() {
     })
     const handlePageChange = (page: number) => {
     if (page === currentPages) return; // avoid double-set
-    router.push(`/panel/prompts?page=${page}`);
+    router.replace(`/panel/prompts?page=${page}`);
     setCurrentPages(page); // 🔁 forces a full re-render on Chrome
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -250,7 +250,7 @@ export default function DashboardPage() {
       <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
         <Select value={selectedDay} onValueChange={(v) =>{
            setSelectedDay(v);
-           router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+           router.replace(`/panel/prompts?page=1`); // Reset to first page on filter change
         }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
@@ -266,7 +266,7 @@ export default function DashboardPage() {
 
         <Select value={selectedPlatform} onValueChange={(v) =>{
           setSelectedPlatform(v);
-          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+          router.replace(`/panel/prompts?page=1`); // Reset to first page on filter change
         }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by platform" />
@@ -283,7 +283,7 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-2">
           <Select value={selectedTag} onValueChange={(v) => {
             setSelectedTag(v);
-            router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+            router.replace(`/panel/prompts?page=1`); // Reset to first page on filter change
             if (v !== "Other") setCustomTag("");
           }}>
             <SelectTrigger className="w-full">
@@ -310,7 +310,7 @@ export default function DashboardPage() {
 
         <Select value={selectedMonth} onValueChange={(v) =>{
           setSelectedMonth(v);
-          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+          router.replace(`/panel/prompts?page=1`); // Reset to first page on filter change
           }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by month" />
@@ -324,7 +324,7 @@ export default function DashboardPage() {
 
         <Select value={selectedYear} onValueChange={(v) =>{
           setSelectedYear(v)
-          router.push(`/panel/prompts?page=1`);}}>
+          router.replace(`/panel/prompts?page=1`);}}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by year" />
           </SelectTrigger>
@@ -337,7 +337,7 @@ export default function DashboardPage() {
 
         <Select value={selectedRange} onValueChange={(v) =>{
           setSelectedRange(v)
-          router.push(`/panel/prompts?page=1`);}}>
+          router.replace(`/panel/prompts?page=1`);}}>
           <SelectTrigger className="w-full gap-2">
             <CalendarDays className="w-4 h-4" />
             <SelectValue placeholder="All Time" />
