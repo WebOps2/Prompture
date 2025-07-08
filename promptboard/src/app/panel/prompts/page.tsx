@@ -343,7 +343,7 @@ export default function DashboardPage() {
       <p className="mt-4">
         <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
       </p>
-      <div className="grid grid-cols-1 gap-4 mt-10 pb-4">
+      <div key={currentPages} className="grid grid-cols-1 gap-4 mt-10 pb-4">
         {paginatedPrompts.length > 0 ? (
           paginatedPrompts.map((prompt) => (
             <PromptCard key={prompt.id} prompt={prompt} />
