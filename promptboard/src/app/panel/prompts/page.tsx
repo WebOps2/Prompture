@@ -82,7 +82,7 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id) return;
 
-    const { data, count,  error } = await supabase
+    const { data,  error } = await supabase
       .from("prompts")
       .select("*", { count: "exact" })
       .eq("user_id", user.id)
