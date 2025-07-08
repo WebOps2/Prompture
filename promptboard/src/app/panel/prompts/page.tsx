@@ -362,8 +362,8 @@ export default function DashboardPage() {
             disabled={currentPages === 1}
             className={`text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 rounded whitespace-nowrap ${
               currentPages === 1
-                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                : "bg-zinc-900 text-white hover:bg-zinc-700"
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-violet-700 text-white hover:bg-violet-800"
             }`}
           >
             Prev
