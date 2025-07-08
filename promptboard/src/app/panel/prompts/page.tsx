@@ -50,19 +50,41 @@ export default function DashboardPage() {
 
   const timeRanges = ["All Time", "Today", "This Week", "This Month"];
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const promptsPerPage = 20;
+  const [totalPages, setTotalPages] = useState(1);
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
+  const filterPrompts = prompts.filter((prompt) => {
+      const matchesDay = selectedDay === "All Days" || new Date(prompt.timestamp).toLocaleString('en-US', { weekday: 'long' }) === selectedDay;
+      const matchesMonth = selectedMonth === "All Months" || new Date(prompt.timestamp).toLocaleString('en-US', { month: 'long' }) === selectedMonth;
+      const matchesYear = selectedYear === "All Years" || new Date(prompt.timestamp).getFullYear().toString() === selectedYear;
+      const matchesPlatform = selectedPlatform === "All Platforms" || prompt.source === selectedPlatform;
+      const matchesTag = selectedTag === "All" || (prompt.tags && prompt.tags.includes(selectedTag)) || (selectedTag === "Other" && customTag && prompt.tags && prompt.tags.includes(customTag));
+      const matchesRange = selectedRange === "All Time" ||
+        (selectedRange === "Today" && new Date(prompt.timestamp).toDateString() === new Date().toDateString()) ||
+        (selectedRange === "This Week" && 
+          new Date(prompt.timestamp).getTime() >= new Date(new Date().setDate(new Date().getDate() - new Date().getDay())).getTime() &&
+          new Date(prompt.timestamp).getTime() <= new Date().getTime()) ||  
+        (selectedRange === "This Month" && new Date(prompt.timestamp).getMonth() === new Date().getMonth() &&
+          new Date(prompt.timestamp).getFullYear() === new Date().getFullYear()); 
+
+      return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
+    })
+    const start = (currentPage - 1) * promptsPerPage;
+    const paginatedPrompts = filterPrompts.slice(start, start + promptsPerPage);  
 
 
   useEffect(() => {
     
     const fetchAllPrompts = async () => {
+      // const from = (page - 1) * promptsPerPage;
+      // const to = from + promptsPerPage - 1;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id) return;
 
-    const { data, error } = await supabase
+    const { data, count,  error } = await supabase
       .from("prompts")
-      .select("*")
+      .select("*", { count: "exact" })
       .eq("user_id", user.id)
       .order("timestamp", { ascending: false });
 
@@ -71,7 +93,9 @@ export default function DashboardPage() {
       console.error("Error fetching prompts:", error);
       return;
     }
+    
     setPrompts(data);
+    setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
     }
 
     const loadPromptDateMetadata = async () => {
@@ -156,9 +180,13 @@ export default function DashboardPage() {
     loadPromptDateMetadata();
     fetchTags();
     // console.log(pro)
+    setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage))
 
     
   }, []);
+  useEffect(() => {
+    setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
+  }, [filterPrompts])
   // console.log("Prompts loaded:", prompts);
 //   const years = useMemo(() => {
 //   const allYears = prompts.map((p) =>
@@ -166,22 +194,7 @@ export default function DashboardPage() {
 //   );
 //   return ["All Years", ...Array.from(new Set(allYears))];
 // }, [prompts]);
-  const filterPrompts = prompts.filter((prompt) => {
-      const matchesDay = selectedDay === "All Days" || new Date(prompt.timestamp).toLocaleString('en-US', { weekday: 'long' }) === selectedDay;
-      const matchesMonth = selectedMonth === "All Months" || new Date(prompt.timestamp).toLocaleString('en-US', { month: 'long' }) === selectedMonth;
-      const matchesYear = selectedYear === "All Years" || new Date(prompt.timestamp).getFullYear().toString() === selectedYear;
-      const matchesPlatform = selectedPlatform === "All Platforms" || prompt.source === selectedPlatform;
-      const matchesTag = selectedTag === "All" || (prompt.tags && prompt.tags.includes(selectedTag)) || (selectedTag === "Other" && customTag && prompt.tags && prompt.tags.includes(customTag));
-      const matchesRange = selectedRange === "All Time" ||
-        (selectedRange === "Today" && new Date(prompt.timestamp).toDateString() === new Date().toDateString()) ||
-        (selectedRange === "This Week" && 
-          new Date(prompt.timestamp).getTime() >= new Date(new Date().setDate(new Date().getDate() - new Date().getDay())).getTime() &&
-          new Date(prompt.timestamp).getTime() <= new Date().getTime()) ||  
-        (selectedRange === "This Month" && new Date(prompt.timestamp).getMonth() === new Date().getMonth() &&
-          new Date(prompt.timestamp).getFullYear() === new Date().getFullYear()); 
-
-      return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
-    })
+  
 
     console.log("Filtered prompts:", filterPrompts);
 
@@ -307,9 +320,9 @@ export default function DashboardPage() {
       <p className="mt-4">
         <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
       </p>
-      <div className="grid grid-cols-1 gap-4 mt-6">
-        {filterPrompts.length > 0 ? (
-          filterPrompts.map((prompt) => (
+      <div className="grid grid-cols-1 gap-4 mt-10 pb-4">
+        {paginatedPrompts.length > 0 ? (
+          paginatedPrompts.map((prompt) => (
             <PromptCard key={prompt.id} prompt={prompt} />
           ))
         ) : (
@@ -317,6 +330,37 @@ export default function DashboardPage() {
             No prompts found for selected filters.
           </p>
         )}
+      </div>
+      <div className="flex justify-center items-center gap-2 mt-6 mb-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded ${currentPage === 1 ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-zinc-900 text-white hover:bg-zinc-700"}`}
+        >
+          Prev
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 6).map((page) => (
+          <button
+            key={page}
+            onClick={() => setCurrentPage(page) }
+            className={`px-4 py-2 rounded ${
+              page === currentPage ? "bg-indigo-500 text-white" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded ${
+            currentPage === totalPages ? "bg-zinc-800 text-zinc-400" : "bg-orange-500 text-black font-semibold hover:bg-orange-400"
+          }`}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

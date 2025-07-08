@@ -41,6 +41,10 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     const [editedPrompt, setEditedPrompt] = useState(prompt.prompt);
     const [localPrompt, setLocalPrompt] = useState(prompt.prompt);
     const [favorited, setFavorited] = useState(prompt.favorite || false);
+    const [localTags, setLocalTags] = useState<string[]>(prompt.tags || []);
+    const [addingTag, setAddingTag] = useState(false);
+    const [newTag, setNewTag] = useState("");
+
     console.log(prompt.favorite, "favorited state");
 
     const handlePromptChange = (newText: string) => {
@@ -58,6 +62,25 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
         console.log("✅ Prompt updated!");
         setLocalPrompt(editedPrompt);   // update what displays
         setIsEditing(false);
+      }
+    };
+    const handleAddTag = async () => {
+      const trimmed = newTag.trim();
+      if (!trimmed || localTags.includes(trimmed)) return;
+
+      const updatedTags = [...localTags, trimmed];
+
+      const { error } = await supabase
+        .from("prompts")
+        .update({ tags: updatedTags })
+        .eq("id", prompt.id);
+
+      if (error) {
+        console.error("❌ Failed to update tags:", error);
+      } else {
+        setLocalTags(updatedTags);
+        setNewTag("");
+        setAddingTag(false);
       }
     };
     const toggleFavorite = async () => {
@@ -233,11 +256,15 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     </div>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-2 mt-4">
-        {(prompt.tags || []).map((tag) => (
+      <div className="flex items-center flex-wrap gap-2 mt-4">
+        {/* Tag Icon (optional) */}
+        <span className="text-zinc-400 text-sm">#</span>
+
+        {/* Render existing tags */}
+        {localTags.map((tag) => (
           <span
             key={tag}
-            className="bg-zinc-200 dark:bg-zinc-700 text-xs px-3 py-1 rounded-full font-medium text-zinc-700 dark:text-zinc-300"
+            className="px-3 py-1 text-xs rounded-full border border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-white"
           >
             {tag}
           </span>
@@ -245,15 +272,55 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
       </div>
 
       {/* Bottom Right Icons */}
-      <div className="flex justify-end gap-4 mt-6 text-zinc-500 dark:text-zinc-400">
-        <Pencil className="w-4 h-4 cursor-pointer hover:text-blue-500" onClick={() => setIsEditing(true)}/>
-        <Star
-          className={`w-4 h-4 cursor-pointer transition ${
-            favorited
-              ? "fill-yellow-400"
-              : "hover:text-yellow-400"
-          }`} onClick={toggleFavorite}
-        />
+      <div className="flex justify-between items-center mt-6 text-zinc-500 dark:text-zinc-400">
+        {/* Add Tag Section */}
+        {addingTag ? (
+          <div className="flex items-center gap-3">
+          <input
+            type="text"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            placeholder="New tag"
+            className="px-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
+          <button
+            onClick={handleAddTag}
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => {
+              setAddingTag(false);
+              setNewTag("");
+            }}
+            className="text-sm text-zinc-500 hover:text-zinc-700 transition"
+          >
+            Cancel
+          </button>
+        </div>
+        ) : (
+          <button
+            onClick={() => setAddingTag(true)}
+            className="text-xs px-3 py-1 flex items-center gap-1 rounded-full border border-indigo-100 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-400 dark:hover:bg-indigo-900"
+          >
+            <span className="text-sm">#</span> Add Tags
+          </button>
+        )}
+
+        {/* Icons: Edit + Favorite */}
+        <div className="flex items-center gap-4">
+          <Pencil
+            className="w-4 h-4 cursor-pointer hover:text-blue-500"
+            onClick={() => setIsEditing(true)}
+          />
+          <Star
+            className={`w-4 h-4 cursor-pointer transition ${
+              favorited ? "fill-yellow-400" : "hover:text-yellow-400"
+            }`}
+            onClick={toggleFavorite}
+          />
+        </div>
       </div>
     </div>
   );
