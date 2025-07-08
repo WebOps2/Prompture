@@ -55,7 +55,12 @@ export default function DashboardPage() {
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentPages = parseInt(searchParams.get("page") || "1", 10);
+  // const currentPages = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPages, setCurrentPages] = useState(1);
+  useEffect(() => {
+    const pageParam = parseInt(searchParams.get("page") || "1", 10);
+    setCurrentPages(pageParam);
+  }, [searchParams]);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
