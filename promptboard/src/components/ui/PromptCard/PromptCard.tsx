@@ -46,6 +46,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
     const [newTag, setNewTag] = useState("");
 
     console.log(prompt.favorite, "favorited state");
+    
 
     const handlePromptChange = (newText: string) => {
       setEditedPrompt(newText);

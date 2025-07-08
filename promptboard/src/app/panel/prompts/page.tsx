@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase-client';
 import { CalendarDays } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
 type Prompt = {
@@ -50,9 +51,13 @@ export default function DashboardPage() {
 
   const timeRanges = ["All Time", "Today", "This Week", "This Month"];
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const promptsPerPage = 20;
+  // const [currentPage, setCurrentPage] = useState(1);
+  const promptsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPages = parseInt(searchParams.get("page") || "1", 10);
+  // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
       const matchesDay = selectedDay === "All Days" || new Date(prompt.timestamp).toLocaleString('en-US', { weekday: 'long' }) === selectedDay;
@@ -70,9 +75,14 @@ export default function DashboardPage() {
 
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
-    const start = (currentPage - 1) * promptsPerPage;
-    const paginatedPrompts = filterPrompts.slice(start, start + promptsPerPage);  
+    const handlePageChange = (page: number) => {
+    router.push(`/panel/prompts?page=${page}`);
+    // window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
+    const start = (currentPages - 1) * promptsPerPage;
+    const paginatedPrompts = filterPrompts.slice(start, start + promptsPerPage);  
+    
 
   useEffect(() => {
     
@@ -183,7 +193,7 @@ export default function DashboardPage() {
     setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage))
 
     
-  }, []);
+  }, [currentPages]);
   useEffect(() => {
     setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
   }, [filterPrompts])
@@ -228,7 +238,10 @@ export default function DashboardPage() {
 
       {/* Filters - Now Responsive */}
       <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
-        <Select value={selectedDay} onValueChange={setSelectedDay}>
+        <Select value={selectedDay} onValueChange={(v) =>{
+           setSelectedDay(v);
+           router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+        }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
           </SelectTrigger>
@@ -241,7 +254,10 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+        <Select value={selectedPlatform} onValueChange={(v) =>{
+          setSelectedPlatform(v);
+          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+        }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by platform" />
           </SelectTrigger>
@@ -257,6 +273,7 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-2">
           <Select value={selectedTag} onValueChange={(v) => {
             setSelectedTag(v);
+            router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
             if (v !== "Other") setCustomTag("");
           }}>
             <SelectTrigger className="w-full">
@@ -281,7 +298,10 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+        <Select value={selectedMonth} onValueChange={(v) =>{
+          setSelectedMonth(v);
+          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+          }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by month" />
           </SelectTrigger>
@@ -292,7 +312,9 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedYear} onValueChange={setSelectedYear}>
+        <Select value={selectedYear} onValueChange={(v) =>{
+          setSelectedYear(v)
+          router.push(`/panel/prompts?page=1`);}}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by year" />
           </SelectTrigger>
@@ -303,7 +325,9 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedRange} onValueChange={setSelectedRange}>
+        <Select value={selectedRange} onValueChange={(v) =>{
+          setSelectedRange(v)
+          router.push(`/panel/prompts?page=1`);}}>
           <SelectTrigger className="w-full gap-2">
             <CalendarDays className="w-4 h-4" />
             <SelectValue placeholder="All Time" />
@@ -333,9 +357,10 @@ export default function DashboardPage() {
       </div>
       <div className="flex justify-center items-center gap-2 mt-6 mb-4">
         <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded ${currentPage === 1 ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-zinc-900 text-white hover:bg-zinc-700"}`}
+          onClick={() => 
+            handlePageChange(currentPages - 1)}
+          disabled={currentPages === 1}
+          className={`px-4 py-2 rounded ${currentPages === 1 ? "bg-zinc-800 text-zinc-500 cursor-not-allowed" : "bg-zinc-900 text-white hover:bg-zinc-700"}`}
         >
           Prev
         </button>
@@ -343,9 +368,9 @@ export default function DashboardPage() {
         {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 6).map((page) => (
           <button
             key={page}
-            onClick={() => setCurrentPage(page) }
+            onClick={() => {handlePageChange(page)} }
             className={`px-4 py-2 rounded ${
-              page === currentPage ? "bg-indigo-500 text-white" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-700"
+              page === currentPages ? "bg-gradient-to-br from-violet-500 to-purple-500 text-white font-bold px-4 py-2 shadow-sm" : "bg-purple-100 text-purple-600 hover:bg-purple-200"
             }`}
           >
             {page}
@@ -353,10 +378,10 @@ export default function DashboardPage() {
         ))}
 
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPages + 1)}
+          disabled={currentPages === totalPages}
           className={`px-4 py-2 rounded ${
-            currentPage === totalPages ? "bg-zinc-800 text-zinc-400" : "bg-orange-500 text-black font-semibold hover:bg-orange-400"
+            currentPages === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-violet-700 text-white hover:bg-violet-800"
           }`}
         >
           Next
