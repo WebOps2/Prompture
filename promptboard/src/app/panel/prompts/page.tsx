@@ -189,7 +189,7 @@ export default function DashboardPage() {
     loadPromptDateMetadata();
     fetchTags();
     // console.log(pro)
-    setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage))
+    // setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage))
 
     
   }, [currentPages]);
