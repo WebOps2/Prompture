@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase-client';
 import { CalendarDays } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
 type Prompt = {
@@ -53,9 +53,18 @@ export default function DashboardPage() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const promptsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPages, setCurrentPages] = useState(1);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentPages = parseInt(searchParams.get("page") || "1", 10);
+  const pathname = usePathname();
+  // const currentPages = parseInt(searchParams.get("page") || "1", 10);
+
+  useEffect(() =>{
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    if (page !== currentPages) {
+      setCurrentPages(page);
+    }
+  }, [searchParams, pathname]);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -75,8 +84,9 @@ export default function DashboardPage() {
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
     const handlePageChange = (page: number) => {
+    if (page === currentPages) return; // avoid double-set
     router.push(`/panel/prompts?page=${page}`);
-    router.refresh(); 
+    setCurrentPages(page); // 🔁 forces a full re-render on Chrome
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
