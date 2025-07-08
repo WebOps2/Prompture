@@ -65,6 +65,15 @@ export default function DashboardPage() {
       setCurrentPages(page);
     }
   }, [searchParams, pathname, currentPages]);
+  useEffect(() => {
+    const handlePopState = () => {
+      const page = parseInt(searchParams.get("page") || "1", 10);
+      setCurrentPages(page);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [searchParams])
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -87,7 +96,9 @@ export default function DashboardPage() {
     if (page === currentPages) return; // avoid double-set
     router.replace(`/panel/prompts?page=${page}`);
     setCurrentPages(page); // 🔁 forces a full re-render on Chrome
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 100);
   };
 
     const start = (currentPages - 1) * promptsPerPage;
