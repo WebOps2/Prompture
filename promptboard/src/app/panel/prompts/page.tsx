@@ -121,7 +121,12 @@ export default function DashboardPage() {
     }
   };
   const fetchTags = async () => {
-      const { data, error } = await supabase.from("prompts").select("tags");
+    const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      const { data, error } = await supabase
+      .from("prompts")
+      .select("tags")
+      .eq("user_id", user.id);
 
       if (error) {
         console.error("Error fetching tags:", error);
