@@ -74,13 +74,47 @@ export default function DashboardPage() {
 
       return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
     })
+
     const handlePageChange = (page: number) => {
-    router.replace(`/panel/prompts?page=${page}&refresh=${Date.now()}`);;
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+          const params = new URLSearchParams();
+
+          if (selectedPlatform !== "All Platforms") params.set("platform", selectedPlatform);
+          if (selectedTag !== "All" && selectedTag !== "")
+            params.set("tag", selectedTag === "Other" ? customTag : selectedTag);
+          if (selectedDay !== "All Days") params.set("day", selectedDay);
+          if (selectedMonth !== "All Months") params.set("month", selectedMonth);
+          if (selectedYear !== "All Years") params.set("year", selectedYear);
+          if (selectedRange !== "All Time") params.set("range", selectedRange);
+
+          params.set("page", page.toString());
+
+          router.push(`/panel/prompts?${params.toString()}`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+      };
 
     const start = (currentPages - 1) * promptsPerPage;
     const paginatedPrompts = filterPrompts.slice(start, start + promptsPerPage);  
+
+  const updateURL = (filters: {
+        day: string;
+        platform: string;
+        tag: string;
+        month: string;
+        year: string;
+        range: string;
+      }) => {
+        const params = new URLSearchParams();
+
+        if (filters.platform !== "All Platforms") params.set("platform", filters.platform);
+        if (filters.tag !== "All" && filters.tag !== "") params.set("tag", filters.tag);
+        if (filters.day !== "All Days") params.set("day", filters.day);
+        if (filters.month !== "All Months") params.set("month", filters.month);
+        if (filters.year !== "All Years") params.set("year", filters.year);
+        if (filters.range !== "All Time") params.set("range", filters.range);
+
+        params.set("page", "1");
+        router.push(`/panel/prompts?${params.toString()}`);
+    };
     
 
   useEffect(() => {
@@ -244,8 +278,15 @@ export default function DashboardPage() {
       <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
         <Select value={selectedDay} onValueChange={(v) =>{
            setSelectedDay(v);
-           router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
-        }}>
+           updateURL({
+            day: v,
+            platform: selectedPlatform,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: selectedMonth,
+            year: selectedYear,
+            range: selectedRange,
+        });; // Reset to first page on filter change
+          }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
           </SelectTrigger>
@@ -260,7 +301,14 @@ export default function DashboardPage() {
 
         <Select value={selectedPlatform} onValueChange={(v) =>{
           setSelectedPlatform(v);
-          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+          updateURL({
+            day: selectedDay,
+            platform: v,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: selectedMonth,
+            year: selectedYear,
+            range: selectedRange,
+        });; // Reset to first page on filter change
         }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by platform" />
@@ -277,7 +325,14 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-2">
           <Select value={selectedTag} onValueChange={(v) => {
             setSelectedTag(v);
-            router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+            updateURL({
+              day: selectedDay,
+              platform: selectedPlatform,
+              tag: v === "Other" ? customTag : v,
+              month: selectedMonth,
+              year: selectedYear,
+              range: selectedRange,
+          });; // Reset to first page on filter change
             if (v !== "Other") setCustomTag("");
           }}>
             <SelectTrigger className="w-full">
@@ -304,7 +359,14 @@ export default function DashboardPage() {
 
         <Select value={selectedMonth} onValueChange={(v) =>{
           setSelectedMonth(v);
-          router.push(`/panel/prompts?page=1`); // Reset to first page on filter change
+          updateURL({
+            day: selectedDay,
+            platform: selectedPlatform,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: v,
+            year: selectedYear,
+            range: selectedRange,
+          }); // Reset to first page on filter change
           }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by month" />
@@ -318,7 +380,14 @@ export default function DashboardPage() {
 
         <Select value={selectedYear} onValueChange={(v) =>{
           setSelectedYear(v)
-          router.push(`/panel/prompts?page=1`);}}>
+          updateURL({
+            day: selectedDay,
+            platform: selectedPlatform,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: selectedMonth,
+            year: v,
+            range: selectedRange,
+          });;}}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by year" />
           </SelectTrigger>
@@ -331,7 +400,14 @@ export default function DashboardPage() {
 
         <Select value={selectedRange} onValueChange={(v) =>{
           setSelectedRange(v)
-          router.push(`/panel/prompts?page=1`);}}>
+          updateURL({
+            day: selectedDay,
+            platform: selectedPlatform,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: selectedMonth,
+            year: selectedYear,
+            range: v,
+          });;}}>
           <SelectTrigger className="w-full gap-2">
             <CalendarDays className="w-4 h-4" />
             <SelectValue placeholder="All Time" />
