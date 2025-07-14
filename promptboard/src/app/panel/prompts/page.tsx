@@ -387,7 +387,7 @@ export default function DashboardPage() {
             month: selectedMonth,
             year: v,
             range: selectedRange,
-          });;}}>
+          });}}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by year" />
           </SelectTrigger>
