@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [usedToday, setUsedToday] = useState(0);
   const [favorites, setFavorites] = useState(0);
   const [recentPrompts, setRecentPrompts] = useState<Prompt[]>([]);
+  const [recentFavorites, setRecentFavorites] = useState<Prompt[]>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -135,6 +136,31 @@ export default function DashboardPage() {
       setRecentPrompts(recentPrompts || []);
     }
     }
+    const fetchRecentFavorites = async () => {
+      const {data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error("No user found");
+        setLoading(false);
+        return;
+      }
+
+      const { data: recentFavorites, error } = await supabase
+      .from('prompts')
+      .select('id, Title, prompt, source, tags, timestamp, favorite')
+      .eq('user_id', user.id)
+      .eq('favorite', true) // Only fetch favorites
+      .order('timestamp', { ascending: false }) // Most recent first
+      .limit(5); // Only 5 prompts  
+
+    if (error) {
+      console.error("❌ Error fetching recent favorites:", error.message);  
+    }
+    else {
+      console.log("✅ Recent Favorites:", recentFavorites);
+      setRecentFavorites(recentFavorites || []);
+    }
+    }
+    fetchRecentFavorites();
     fetchRecentPrompts();
     fetchPrompts();
     fetchStats();
@@ -212,6 +238,39 @@ export default function DashboardPage() {
             ))}
           </div>
       </section>
+      <section className="mt-10 w-full p-4">
+        {/* Section Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Recent Favorites</h2>
+          <a
+            href="/panel/prompts?filter=favorites"
+            className="text-purple-600 hover:underline text-sm font-medium"
+          >
+            View All →
+          </a>
+        </div>
+
+        {/* Cards Container */}
+        <div className="flex gap-6 pb-4 overflow-x-auto no-scrollbar">
+          {recentFavorites.length > 0 ? (
+            recentFavorites.map((prompt) => (
+              <DashboardPromptCard
+                key={prompt.id}
+                id={prompt.id}
+                title={prompt.Title}
+                prompt={prompt.prompt}
+                source={prompt.source}
+                tags={prompt.tags || []}
+                timestamp={prompt.timestamp}
+                favorite={prompt.favorite}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500">No recent favorites yet.</p>
+          )}
+        </div>
+      </section>
+
     </>
    
   );
