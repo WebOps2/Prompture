@@ -3,6 +3,7 @@
 import EmptyDashBoard from '@/app/EmptyDashboard';
 import BarChartComponent from '@/components/BarChart';
 import DashboardPromptCard from '@/components/DashBoardPromptCard';
+import TagsPieChart from '@/components/PieChart';
 import { supabase } from '@/lib/supabase-client';
 import { BookOpen, Star, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -333,7 +334,10 @@ export default function DashboardPage() {
           )}
         </div>
       </section>
-      <BarChartComponent />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+        <BarChartComponent /> {/* Your existing bar chart */}
+        <TagsPieChart />
+    </div>
 
     </>
    
