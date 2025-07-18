@@ -51,6 +51,10 @@ export default function BarChartComponent() {
           loadData();
         }, []);
 
+        if (loading) {
+            return <div className="text-center">Loading chart...</div>;
+        }
+
 
         return (
             <section className="mt-10 p-6 bg-white rounded-xl shadow-md">
