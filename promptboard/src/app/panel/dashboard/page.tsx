@@ -1,6 +1,7 @@
 'use client';
 
 import EmptyDashBoard from '@/app/EmptyDashboard';
+import BarChartComponent from '@/components/BarChart';
 import DashboardPromptCard from '@/components/DashBoardPromptCard';
 import { supabase } from '@/lib/supabase-client';
 import { BookOpen, Star, Zap } from 'lucide-react';
@@ -198,7 +199,6 @@ export default function DashboardPage() {
       const tags = await fetchMostUsedTags();
       setMostUsedTags(tags || []); // Extract tag names
     }
-
     loadingMostUsedTags();
     
     fetchRecentFavorites();
@@ -333,6 +333,7 @@ export default function DashboardPage() {
           )}
         </div>
       </section>
+      <BarChartComponent />
 
     </>
    
