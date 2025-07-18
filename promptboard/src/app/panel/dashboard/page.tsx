@@ -23,6 +23,39 @@ export default function DashboardPage() {
   const [favorites, setFavorites] = useState(0);
   const [recentPrompts, setRecentPrompts] = useState<Prompt[]>([]);
   const [recentFavorites, setRecentFavorites] = useState<Prompt[]>([]);
+  const [mostUsedTags, setMostUsedTags] = useState<[string, number][]>([]);
+  const fetchMostUsedTags = async () => {
+      const {data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error("No user found");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('prompts')
+        .select('tags')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error("Error fetching tags", error);
+        return [];
+      }
+
+      // Process tags to find most used
+      const tagCount: Record<string, number> = {};
+      data.forEach((row) => {
+        if (Array.isArray(row.tags)) {
+          row.tags.forEach((tag) => {
+            tagCount[tag] = (tagCount[tag] || 0) + 1;
+          });
+        }
+      });
+
+       return Object.entries(tagCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+    }
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -152,14 +185,22 @@ export default function DashboardPage() {
       .order('timestamp', { ascending: false }) // Most recent first
       .limit(5); // Only 5 prompts  
 
-    if (error) {
-      console.error("❌ Error fetching recent favorites:", error.message);  
+      if (error) {
+        console.error("❌ Error fetching recent favorites:", error.message);  
+      }
+      else {
+        console.log("✅ Recent Favorites:", recentFavorites);
+        setRecentFavorites(recentFavorites || []);
+      }
     }
-    else {
-      console.log("✅ Recent Favorites:", recentFavorites);
-      setRecentFavorites(recentFavorites || []);
+
+    const loadingMostUsedTags = async () => {
+      const tags = await fetchMostUsedTags();
+      setMostUsedTags(tags || []); // Extract tag names
     }
-    }
+
+    loadingMostUsedTags();
+    
     fetchRecentFavorites();
     fetchRecentPrompts();
     fetchPrompts();
@@ -267,6 +308,28 @@ export default function DashboardPage() {
             ))
           ) : (
             <p className="text-gray-500">No recent favorites yet.</p>
+          )}
+        </div>
+      </section>
+      <section className="mt-10 w-full mb-4">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Most Used Tags</h2>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-3">
+          {mostUsedTags.length > 0 ? (
+            mostUsedTags.map(([tag, count]) => (
+              <span
+                key={tag}
+                className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-full flex items-center gap-2"
+              >
+                {tag} <span className="text-xs text-gray-500">({count})</span>
+              </span>
+            ))
+          ) : (
+            <p className="text-gray-500 text-sm">No tags available yet.</p>
           )}
         </div>
       </section>
