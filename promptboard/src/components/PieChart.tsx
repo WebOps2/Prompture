@@ -80,7 +80,7 @@ export default function TagsPieChart() {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center w-full max-w-full ">
       <h3 className="text-lg font-semibold mb-4">Categories Distribution</h3>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
             data={tagData}
