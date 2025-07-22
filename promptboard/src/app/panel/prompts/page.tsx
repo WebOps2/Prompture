@@ -48,7 +48,6 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [semanticMode, setSemanticMode] = useState(false);
   const [semanticIds, setSemanticIds] = useState<string[]>([]);
-const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   // const [allPrompts, setAllPrompts] = useState<Prompt[]>([]);
   // const years = ["All", "2023", "2024", "2025"]
   const [selectedRange, setSelectedRange] = useState("All Time");
