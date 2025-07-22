@@ -1,9 +1,9 @@
 
-import { openaiApiKey, supabase } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: openaiApiKey });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: Request) {
     try{
