@@ -45,6 +45,10 @@ export default function DashboardPage() {
   "All Months", "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
   ];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [semanticMode, setSemanticMode] = useState(false);
+  const [semanticIds, setSemanticIds] = useState<string[]>([]);
+const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   // const [allPrompts, setAllPrompts] = useState<Prompt[]>([]);
   // const years = ["All", "2023", "2024", "2025"]
   const [selectedRange, setSelectedRange] = useState("All Time");
@@ -59,21 +63,60 @@ export default function DashboardPage() {
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
-      const matchesDay = selectedDay === "All Days" || new Date(prompt.timestamp).toLocaleString('en-US', { weekday: 'long' }) === selectedDay;
-      const matchesMonth = selectedMonth === "All Months" || new Date(prompt.timestamp).toLocaleString('en-US', { month: 'long' }) === selectedMonth;
-      const matchesYear = selectedYear === "All Years" || new Date(prompt.timestamp).getFullYear().toString() === selectedYear;
-      const matchesPlatform = selectedPlatform === "All Platforms" || prompt.source === selectedPlatform;
-      const matchesTag = selectedTag === "All" || (prompt.tags && prompt.tags.includes(selectedTag)) || (selectedTag === "Other" && customTag && prompt.tags && prompt.tags.includes(customTag));
-      const matchesRange = selectedRange === "All Time" ||
-        (selectedRange === "Today" && new Date(prompt.timestamp).toDateString() === new Date().toDateString()) ||
-        (selectedRange === "This Week" && 
-          new Date(prompt.timestamp).getTime() >= new Date(new Date().setDate(new Date().getDate() - new Date().getDay())).getTime() &&
-          new Date(prompt.timestamp).getTime() <= new Date().getTime()) ||  
-        (selectedRange === "This Month" && new Date(prompt.timestamp).getMonth() === new Date().getMonth() &&
-          new Date(prompt.timestamp).getFullYear() === new Date().getFullYear()); 
+      const matchesDay =
+        selectedDay === "All Days" ||
+        new Date(prompt.timestamp).toLocaleString("en-US", { weekday: "long" }) ===
+          selectedDay;
 
-      return matchesDay && matchesMonth && matchesYear && matchesPlatform && matchesTag && matchesRange;
-    })
+      const matchesMonth =
+        selectedMonth === "All Months" ||
+        new Date(prompt.timestamp).toLocaleString("en-US", { month: "long" }) ===
+          selectedMonth;
+
+      const matchesYear =
+        selectedYear === "All Years" ||
+        new Date(prompt.timestamp).getFullYear().toString() === selectedYear;
+
+      const matchesPlatform =
+        selectedPlatform === "All Platforms" || prompt.source === selectedPlatform;
+
+      const matchesTag =
+        selectedTag === "All" ||
+        (prompt.tags && prompt.tags.includes(selectedTag)) ||
+        (selectedTag === "Other" &&
+          customTag &&
+          prompt.tags &&
+          prompt.tags.includes(customTag));
+
+      const matchesRange =
+        selectedRange === "All Time" ||
+        (selectedRange === "Today" &&
+          new Date(prompt.timestamp).toDateString() ===
+            new Date().toDateString()) ||
+        (selectedRange === "This Week" &&
+          new Date(prompt.timestamp).getTime() >=
+            new Date(
+              new Date().setDate(new Date().getDate() - new Date().getDay())
+            ).getTime() &&
+          new Date(prompt.timestamp).getTime() <= new Date().getTime()) ||
+        (selectedRange === "This Month" &&
+          new Date(prompt.timestamp).getMonth() === new Date().getMonth() &&
+          new Date(prompt.timestamp).getFullYear() === new Date().getFullYear());
+
+      const matchesSemantic =
+        !semanticMode || semanticIds.includes(prompt.id);
+
+      return (
+        matchesDay &&
+        matchesMonth &&
+        matchesYear &&
+        matchesPlatform &&
+        matchesTag &&
+        matchesRange &&
+        matchesSemantic
+      );
+    });
+
 
     const handlePageChange = (page: number) => {
           const params = new URLSearchParams();
@@ -115,7 +158,33 @@ export default function DashboardPage() {
         params.set("page", "1");
         router.push(`/panel/prompts?${params.toString()}`);
     };
-    
+
+    const handleSemanticSearch = async () => {
+      setSemanticMode(true)
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("User not found");
+
+        console.log("Running semantic search for:", searchQuery);
+
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: searchQuery, userId: user.id }),
+        });
+
+        const data = await res.json();
+        console.log("Semantic search response:", data);
+        if (!res.ok) throw new Error(data.error || "Failed to search");
+
+        const ids = data.results.map((item: { id: string }) => item.id);
+        setSemanticIds(ids);
+
+        console.log("✅ Semantic Search Results:", data.results);
+      } catch (err) {
+        console.error("❌ Semantic search failed:", err);
+      }
+    };
 
   useEffect(() => {
     
@@ -235,6 +304,27 @@ export default function DashboardPage() {
   useEffect(() => {
     setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
   }, [filterPrompts])
+
+//   useEffect(() => {
+//   if (!searchQuery.trim()) {
+//     setSemanticMode(false); // Reset to normal mode if query is empty
+//     return;
+//   }
+
+//   // Clear previous timer
+//   if (typingTimeout) clearTimeout(typingTimeout);
+
+//   // Start a new timer (1 second debounce)
+//   const timeout = setTimeout(() => {
+//     handleSemanticSearch(); // Call search after user stops typing
+//   }, 1000);
+
+//   setTypingTimeout(timeout);
+
+//   return () => {
+//     if (timeout) clearTimeout(timeout);
+//   };
+// }, [searchQuery]);
   // console.log("Prompts loaded:", prompts);
 //   const years = useMemo(() => {
 //   const allYears = prompts.map((p) =>
@@ -266,13 +356,50 @@ export default function DashboardPage() {
       </p>
 
       {/* Search Bar */}
-      <div className="w-full max-w-4xl mx-auto mt-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSemanticSearch(); // Trigger on Enter
+        }}
+        className="relative w-full max-w-4xl mx-auto mt-6"
+      >
         <Input
           type="text"
-          placeholder="Search prompts by keywords, tags, or content..."
-          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+          placeholder="Search prompts semantically..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Prevent reload
+              handleSemanticSearch(); // Trigger search
+            }
+          }}
+          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm pr-12" // Add padding-right for icon
         />
-      </div>
+
+        {/* Search Icon Button */}
+        <button
+          type="button"
+          onClick={handleSemanticSearch}
+          disabled={loading || !searchQuery.trim()}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-violet-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
+            />
+          </svg>
+        </button>
+      </form>
 
       {/* Filters - Now Responsive */}
       <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
