@@ -21,8 +21,8 @@ export async function POST(request: Request) {
         const { data, error } = await supabase.rpc("match_prompts", {
             query_embedding: embedding,
             user_id: userId,
-            similarity_threshold: 0.5, // Adjust threshold as needed
-            match_count: 10 // Limit to top 10 results
+            similarity_threshold: 0.58, // Adjust threshold as needed
+            match_count: 50 // Limit to top 10 results
         });
 
         if (error) {
