@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 import { openai, supabase } from "@/lib/supabase-client";
 import { NextResponse } from "next/server";
