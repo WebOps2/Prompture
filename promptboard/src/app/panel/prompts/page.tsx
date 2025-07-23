@@ -372,7 +372,8 @@ export default function DashboardPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSemanticSearch(); // Trigger on Enter
+          
+          // handleSemanticSearch(); // Trigger on Enter
         }}
         className="relative w-full max-w-4xl mx-auto mt-6"
       >
@@ -384,6 +385,11 @@ export default function DashboardPage() {
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault(); // Prevent reload
+              if (!searchQuery.trim()) {
+                setSemanticMode(false);
+                setSemanticIds([]);
+                return; // Prevent empty search
+              }
               handleSemanticSearch(); // Trigger search
             }
           }}
