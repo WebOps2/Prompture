@@ -10,7 +10,7 @@ async function backfillEmbeddings() {
   const { data: prompts, error } = await supabase
     .from("prompts")
     .select("id, prompt")
-    .is("embedding", null)
+    .is("embedding_large", null)
     .limit(1000); // Adjust batch size as needed
 
   if (error) {
@@ -22,7 +22,7 @@ async function backfillEmbeddings() {
     try {
       // 2. Generate embedding for the prompt
       const embeddingResponse = await openai.embeddings.create({
-        model: "text-embedding-3-small", // or text-embedding-3-large
+        model: "text-embedding-3-large", // or text-embedding-3-large
         input: row.prompt
       });
 
@@ -33,7 +33,7 @@ async function backfillEmbeddings() {
       // 3. Update the prompt with its embedding
       const { error: updateError } = await supabase
         .from("prompts")
-        .update({ embedding })
+        .update({ embedding_large: embedding })
         .eq("id", row.id);
 
       if (updateError) {

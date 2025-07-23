@@ -13,15 +13,15 @@ export async function POST(request: Request) {
         }
          // ✅ Generate embedding for the search query
         const embeddingRes = await openai.embeddings.create({
-        model: "text-embedding-3-small",
+        model: "text-embedding-3-large",
         input: query
         });
         const embedding = embeddingRes.data[0].embedding;
 
-        const { data, error } = await supabase.rpc("match_prompts", {
+        const { data, error } = await supabase.rpc("match_prompts_large", {
             query_embedding: embedding,
-            user_id: userId,
-            similarity_threshold: 0.58, // Adjust threshold as needed
+            user_id_input: userId,
+            similarity_threshold: 0.3, // Adjust threshold as needed
             match_count: 50 // Limit to top 10 results
         });
 

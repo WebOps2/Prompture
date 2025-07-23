@@ -5,7 +5,7 @@ import BarChartComponent from '@/components/BarChart';
 import DashboardPromptCard from '@/components/DashBoardPromptCard';
 import TagsPieChart from '@/components/PieChart';
 import { supabase } from '@/lib/supabase-client';
-import { BookOpen, Star, Zap } from 'lucide-react';
+import { BookOpen, Loader2, Star, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Prompt {
@@ -209,7 +209,11 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return (
+    <div className="flex justify-center items-center h-[60vh]">
+      <Loader2 className="h-10 w-10 animate-spin text-violet-600" />
+    </div>
+  );
   }
 
   if (!hasPrompts) {

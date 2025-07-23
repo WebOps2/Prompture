@@ -1,6 +1,7 @@
 'use client';
 
 import EmptyDashBoard from '@/app/EmptyDashboard';
+import PromptCardSkeleton from '@/components/Skeleton';
 import { Input } from "@/components/ui/input";
 import { PromptCard } from '@/components/ui/PromptCard/PromptCard';
 import {
@@ -11,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase-client';
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
@@ -159,6 +160,7 @@ export default function DashboardPage() {
     };
 
     const handleSemanticSearch = async () => {
+      setLoading(true);
       setSemanticMode(true)
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -183,6 +185,8 @@ export default function DashboardPage() {
       } catch (err) {
         console.error("❌ Semantic search failed:", err);
       }
+      setLoading(false);
+      setSearchQuery(""); // Clear search query after search
     };
 
   useEffect(() => {
@@ -191,7 +195,11 @@ export default function DashboardPage() {
       // const from = (page - 1) * promptsPerPage;
       // const to = from + promptsPerPage - 1;
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) return;
+      if (!user?.id){
+        setHasPrompts(false);
+        setLoading(true);
+        return;
+      }
 
     const { data,  error } = await supabase
       .from("prompts")
@@ -202,11 +210,13 @@ export default function DashboardPage() {
 
       if (error) {
       console.error("Error fetching prompts:", error);
+      setLoading(false);
       return;
     }
     
     setPrompts(data);
     setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
+    setLoading(false);
     }
 
     const loadPromptDateMetadata = async () => {
@@ -337,7 +347,11 @@ export default function DashboardPage() {
 
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return (
+    <div className="flex justify-center items-center h-[60vh]">
+      <Loader2 className="h-10 w-10 animate-spin text-violet-600" />
+    </div>
+  );
   }
 
   if (!hasPrompts) {
@@ -551,14 +565,20 @@ export default function DashboardPage() {
         <strong>{filterPrompts.length}</strong> {filterPrompts.length === 1 ? "prompt" : "prompts"} found
       </p>
       <div key={currentPages} className="grid grid-cols-1 gap-4 mt-10 pb-4">
-        {paginatedPrompts.length > 0 ? (
+        {loading || ( paginatedPrompts.length === 0 && prompts.length > 0) ? (
+          <p className="text-center text-gray-500 dark:text-gray-400 col-span-full">
+            No prompts found for selected filters.
+          </p>
+        ) : paginatedPrompts.length > 0 ? (
           paginatedPrompts.map((prompt) => (
             <PromptCard key={prompt.id} prompt={prompt} />
           ))
         ) : (
-          <p className="text-center text-gray-500 dark:text-gray-400 col-span-full">
-            No prompts found for selected filters.
-          </p>
+         <>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <PromptCardSkeleton key={i} />
+          ))}
+        </>
         )}
       </div>
       <div className="w-full overflow-x-auto">
