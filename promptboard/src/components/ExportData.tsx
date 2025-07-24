@@ -38,15 +38,23 @@ export default function ExportDataSection() {
     }
   };
 
-  const convertToCSV = (data: any[]) => {
-    const headers = Object.keys(data[0] || {}).join(",");
-    const rows = data.map((row) =>
-      Object.values(row)
-        .map((val) => `"${String(val).replace(/"/g, '""')}"`)
-        .join(",")
-    );
-    return [headers, ...rows].join("\n");
-  };
+  // Accepts an array of generic objects
+const convertToCSV = <T extends Record<string, unknown>>(data: T[]): string => {
+  if (data.length === 0) return "";
+
+  // Get headers from the first object
+  const headers = Object.keys(data[0]).join(",");
+
+  // Convert each row to CSV-safe values
+  const rows = data.map((row) =>
+    Object.values(row)
+      .map((val) => `"${String(val ?? "").replace(/"/g, '""')}"`) // handle null/undefined
+      .join(",")
+  );
+
+  return [headers, ...rows].join("\n");
+};
+
 
   const downloadFile = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);

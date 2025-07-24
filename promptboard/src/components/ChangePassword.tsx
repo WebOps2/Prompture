@@ -42,6 +42,7 @@ export default function PasswordSection() {
       }
     } catch (err) {
       setErrorMsg("Something went wrong.");
+      console.error("Password update error:", err);
     } finally {
       setLoading(false);
     }
