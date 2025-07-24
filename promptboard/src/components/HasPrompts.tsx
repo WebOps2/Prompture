@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase-client";
 import { useEffect, useState } from "react";
 
-export function userHasPrompts() {
+export function UserHasPrompts() {
   const [hasPrompts, setHasPrompts] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
