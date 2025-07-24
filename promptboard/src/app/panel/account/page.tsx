@@ -4,7 +4,7 @@ import EmptyDashBoard from "@/app/EmptyDashboard";
 import ChangePassword from "@/components/ChangePassword";
 import DangerZone from "@/components/Delete";
 import ExportDataSection from "@/components/ExportData";
-import { userHasPrompts } from "@/components/HasPrompts";
+import { UserHasPrompts } from "@/components/HasPrompts";
 import ChromeExtensionCard from "@/components/Synced";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AccountPage() {
-  const { hasPrompts, loading: hasPromptLoading, error } = userHasPrompts();
+  const { hasPrompts, loading: hasPromptLoading, error } = UserHasPrompts();
 
   const [displayName, setDisplayName] = useState(""); // Header display
   const [editableName, setEditableName] = useState(""); // Input field value
