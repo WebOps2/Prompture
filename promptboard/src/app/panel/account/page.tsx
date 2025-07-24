@@ -2,8 +2,10 @@
 
 import EmptyDashBoard from "@/app/EmptyDashboard";
 import ChangePassword from "@/components/ChangePassword";
+import DangerZone from "@/components/Delete";
 import ExportDataSection from "@/components/ExportData";
 import { userHasPrompts } from "@/components/HasPrompts";
+import ChromeExtensionCard from "@/components/Synced";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase-client";
@@ -13,31 +15,75 @@ import { useEffect, useState } from "react";
 export default function AccountPage() {
   const { hasPrompts, loading: hasPromptLoading, error } = userHasPrompts();
 
-  const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState(""); // Header display
+  const [editableName, setEditableName] = useState(""); // Input field value
   const [email, setEmail] = useState("");
   const [memberSince, setMemberSince] = useState("");
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
 
+  const handleSave = async () => {
+    setSaving(true);
 
-  const handleSave = () => {
-    console.log("Saving Full Name:", fullName);
-    // TODO: Add Supabase update logic here
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error("Error fetching user:", userError?.message);
+        alert("You must be logged in to update profile.");
+        setSaving(false);
+        return;
+      }
+
+      // ✅ Update in profiles table
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ full_name: editableName })
+        .eq("id", user.id);
+
+      if (profileError) {
+        console.error("Error updating profile:", profileError.message);
+        alert("Failed to update profile.");
+        setSaving(false);
+        return;
+      }
+
+      // ✅ Update auth metadata (optional)
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { full_name: editableName },
+      });
+
+      if (metadataError) {
+        console.warn("User metadata not updated:", metadataError.message);
+      }
+
+      // ✅ Update header display only after successful save
+      setDisplayName(editableName);
+
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
-        setLoading(true);
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-          console.error("Error fetching user data:", error);
-          return;
-        }
-        setEmail(user.email || "");
-        setFullName(user.user_metadata?.full_name || "");
-        setMemberSince(new Date(user.created_at).toLocaleDateString());
-        setLoading(false);
-    }
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        console.error("Error fetching user data:", error);
+        return;
+      }
+
+      const name = user.user_metadata?.full_name || "";
+      setEmail(user.email || "");
+      setEditableName(name); // Input field value
+      setDisplayName(name); // Header display
+      setMemberSince(new Date(user.created_at).toLocaleDateString());
+    };
+
     fetchUserData();
   }, []);
 
@@ -57,14 +103,11 @@ export default function AccountPage() {
     <div className="max-w-4xl mx-auto px-6 mt-8 space-y-8">
       {/* Profile Header */}
       <div className="flex items-center gap-6">
-        {/* Profile Icon */}
         <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full">
           <UserCircle className="w-8 h-8 text-gray-700" />
         </div>
-
-        {/* Name & Email */}
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">{fullName}</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">{displayName}</h2>
           <p className="text-sm text-gray-500">{email}</p>
         </div>
       </div>
@@ -77,8 +120,8 @@ export default function AccountPage() {
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
           <Input
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={editableName}
+            onChange={(e) => setEditableName(e.target.value)}
             placeholder="Enter your full name"
           />
         </div>
@@ -97,14 +140,20 @@ export default function AccountPage() {
         </div>
 
         {/* Save Button */}
-        <Button onClick={handleSave} className="bg-purple-600 hover:bg-purple-700 text-white">
-          Save Changes
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+        >
+          {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
-        {/* Change Password Section */}
-        <ChangePassword />
-        {/* Export Data Section */}
-        <ExportDataSection />
+
+      {/* Other Sections */}
+      <ChangePassword />
+      <ExportDataSection />
+      <ChromeExtensionCard />
+      <DangerZone />
     </div>
   );
 }
