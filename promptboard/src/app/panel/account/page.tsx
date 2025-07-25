@@ -12,7 +12,7 @@ import { UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AccountPage() {
-  const { hasPrompts, loading: hasPromptLoading, error } = UserHasPrompts();
+  const { loading: hasPromptLoading, error } = UserHasPrompts();
 
   const [displayName, setDisplayName] = useState(""); // Header display
   const [editableName, setEditableName] = useState(""); // Input field value
