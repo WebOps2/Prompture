@@ -1,6 +1,5 @@
 "use client";
 
-import EmptyDashBoard from "@/app/EmptyDashboard";
 import ChangePassword from "@/components/ChangePassword";
 import DangerZone from "@/components/Delete";
 import ExportDataSection from "@/components/ExportData";
@@ -95,9 +94,9 @@ export default function AccountPage() {
     return <div className="text-red-500 text-center">{error}</div>;
   }
 
-  if (!hasPrompts) {
-    return <EmptyDashBoard />;
-  }
+  // if (!hasPrompts) {
+  //   return <EmptyDashBoard />;
+  // }
 
   return (
     <div className="max-w-4xl mx-auto px-6 mt-8 space-y-8">
