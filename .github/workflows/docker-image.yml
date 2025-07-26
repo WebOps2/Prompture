@@ -1,4 +1,4 @@
-name: CI Build
+name: CI Build with Next.js
 
 on:
   push:
@@ -8,25 +8,46 @@ on:
 
 jobs:
   build:
+    name: Build and Verify Next.js App
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      # 1️⃣ Checkout the repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        working-directory: ./promptboard
-        run: npm install
+      # 3️⃣ Cache node_modules for faster builds
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
-      - name: Build Project
+      # 4️⃣ Install dependencies
+      - name: Install dependencies
+        working-directory: ./promptboard
+        run: npm ci
+
+      # 5️⃣ Build Next.js app
+      - name: Build Next.js App
         working-directory: ./promptboard
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
+
+      # 6️⃣ Optional: Placeholder test (so the workflow passes)
+      - name: Run Tests
+        working-directory: ./promptboard
+        run: echo "No tests yet" && exit 0
