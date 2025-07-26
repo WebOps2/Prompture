@@ -20,13 +20,16 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
+        working-directory: ./promptboard
         run: npm install
 
       - name: Build Project
+        working-directory: ./promptboard
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: npm run build
 
       - name: Run Tests
+        working-directory: ./promptboard
         run: npm test
