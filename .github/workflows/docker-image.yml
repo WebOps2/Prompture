@@ -1,0 +1,22 @@
+name: CI Build with Docker
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # ✅ Manual trigger option
+
+jobs:
+  build:
+    name: Build in Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: docker build -f Dockerfile -t promptboard-ci .
+
+      - name: Test Docker Image (Build Check)
+        run: docker run --rm promptboard-ci
