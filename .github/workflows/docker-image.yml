@@ -13,14 +13,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # ✅ Build Docker image with Supabase secrets
       - name: Build Docker Image
-        run: docker build \
-               -f promptboard/Dockerfile \
-               --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-               --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-               -t promptboard-ci promptboard
+        run: |
+          docker build \
+            -f promptboard/Dockerfile \
+            --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
+            -t promptboard-ci promptboard
 
-      # ✅ Verify the build inside the container
       - name: Verify Build
         run: docker run --rm promptboard-ci npm run build
