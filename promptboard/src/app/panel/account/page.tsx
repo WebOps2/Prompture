@@ -117,7 +117,7 @@ export default function AccountPage() {
 
         {/* Full Name */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Full Namesss</label>
           <Input
             value={editableName}
             onChange={(e) => setEditableName(e.target.value)}
