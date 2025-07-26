@@ -1,4 +1,4 @@
-name: CI Build with Docker
+name: CI Build
 
 on:
   push:
@@ -9,17 +9,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Build Docker Image
-        run: |
-          docker build \
-            -f promptboard/Dockerfile \
-            --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-            -t promptboard-ci promptboard
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-      - name: Verify Build
-        run: docker run --rm promptboard-ci npm run build
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Project
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: npm run build
+
+      - name: Run Tests
+        run: npm test
