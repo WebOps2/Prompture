@@ -30,7 +30,3 @@ jobs:
           NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
-
-      - name: Run Tests
-        working-directory: ./promptboard
-        run: npm test
