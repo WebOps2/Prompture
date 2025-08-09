@@ -4,6 +4,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 
 export default function BarChartComponent() {
     // const [data, setData] = useState<{ platform: string; count: number }[]>([]);
+    const [totalPlatforms, setTotalPlatforms] = useState(0);
     const [loading, setLoading] = useState(true);
     const fetchPromptsPerPlatform = async () => {
           const {data: { user }, error: userError } = await supabase.auth.getUser();
@@ -12,8 +13,8 @@ export default function BarChartComponent() {
             setLoading(false);
             return;
           }
-    
-          const { data, error } = await supabase
+
+          const { data, count: totalPlatforms, error } = await supabase
             .from('prompts')
             .select('source')
             .eq('user_id', user.id)
@@ -24,6 +25,7 @@ export default function BarChartComponent() {
             console.error("Error fetching prompts per platform", error);
             return [];
           }
+          setTotalPlatforms(totalPlatforms || 0);
     
           const platformCount: Record<string, number> = {};
           data.forEach((row) => {

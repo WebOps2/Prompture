@@ -60,7 +60,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPages = parseInt(searchParams.get("page") || "1", 10);
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -199,7 +199,7 @@ export default function DashboardPage() {
       if (userErr || !user?.id) {
         setHasPrompts(false);
         setPrompts([]);
-        setTotal(0);
+        // setTotal(0);
         setTotalPages(1);
         setLoading(false);
         return;
@@ -214,19 +214,19 @@ export default function DashboardPage() {
         console.error("Error fetching prompts via RPC:", error);
         setHasPrompts(false);
         setPrompts([]);
-        setTotal(0);
+        // setTotal(0);
         setTotalPages(1);
         setLoading(false);
         return;
       }
 
       // The function returns a single JSON object: { total, rows: [...] }
-      const total = (data as any)?.total ?? 0;
-      const rows = (data as any)?.rows ?? [];
+      const total = data?.total ?? 0;
+      const rows = data?.rows ?? [];
 
       // rows will have `title` (lowercased) because we aliased "Title" as title in SQL
       setPrompts(rows);
-      setTotal(total);
+      // setTotal(total);
       setHasPrompts(total > 0);
 
       // If you're still paginating on the client:
