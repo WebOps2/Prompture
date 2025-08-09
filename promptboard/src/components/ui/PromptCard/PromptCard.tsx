@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 type Prompt = {
   id: string;
-  Title?: string;
+  title?: string;
   prompt: string;
   timestamp: string;
   last_used?: string;
@@ -181,9 +181,9 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
         {prompt.source}
       </span>
 
-      {/* Title */}
+      {/* title */}
       <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mt-2 ">
-        {prompt.Title || "Untitled Prompt"}
+        {prompt.title || "Untitled Prompt"}
       </h3>
 
       {/* Dates */}

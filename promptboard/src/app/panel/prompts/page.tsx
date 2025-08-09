@@ -60,6 +60,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPages = parseInt(searchParams.get("page") || "1", 10);
+  const [total, setTotal] = useState(0);
   // const promptsPerPage = 20;
   // const finalTag = selectedTag !== "Other" ? selectedTag : customTag;
   const filterPrompts = prompts.filter((prompt) => {
@@ -192,32 +193,48 @@ export default function DashboardPage() {
   useEffect(() => {
     
     const fetchAllPrompts = async () => {
-      // const from = (page - 1) * promptsPerPage;
-      // const to = from + promptsPerPage - 1;
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id){
+      setLoading(true);
+
+      const { data: { user }, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !user?.id) {
         setHasPrompts(false);
-        setLoading(true);
+        setPrompts([]);
+        setTotal(0);
+        setTotalPages(1);
+        setLoading(false);
         return;
       }
 
-    const { data,  error } = await supabase
-      .from("prompts")
-      .select("*", { count: "exact" })
-      .eq("user_id", user.id)
-      .order("timestamp", { ascending: false });
-
+      // Call the Postgres function
+      const { data, error } = await supabase.rpc('get_all_prompts_json', {
+        p_user_id: user.id,
+      });
 
       if (error) {
-      console.error("Error fetching prompts:", error);
+        console.error("Error fetching prompts via RPC:", error);
+        setHasPrompts(false);
+        setPrompts([]);
+        setTotal(0);
+        setTotalPages(1);
+        setLoading(false);
+        return;
+      }
+
+      // The function returns a single JSON object: { total, rows: [...] }
+      const total = (data as any)?.total ?? 0;
+      const rows = (data as any)?.rows ?? [];
+
+      // rows will have `title` (lowercased) because we aliased "Title" as title in SQL
+      setPrompts(rows);
+      setTotal(total);
+      setHasPrompts(total > 0);
+
+      // If you're still paginating on the client:
+      setTotalPages(Math.max(1, Math.ceil(total / promptsPerPage)));
+
       setLoading(false);
-      return;
-    }
-    
-    setPrompts(data);
-    setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
-    setLoading(false);
-    }
+    };
+
 
     const loadPromptDateMetadata = async () => {
     const { data, error } = await supabase
@@ -313,34 +330,6 @@ export default function DashboardPage() {
   useEffect(() => {
     setTotalPages(Math.ceil(filterPrompts.length / promptsPerPage));
   }, [filterPrompts])
-
-//   useEffect(() => {
-//   if (!searchQuery.trim()) {
-//     setSemanticMode(false); // Reset to normal mode if query is empty
-//     return;
-//   }
-
-//   // Clear previous timer
-//   if (typingTimeout) clearTimeout(typingTimeout);
-
-//   // Start a new timer (1 second debounce)
-//   const timeout = setTimeout(() => {
-//     handleSemanticSearch(); // Call search after user stops typing
-//   }, 1000);
-
-//   setTypingTimeout(timeout);
-
-//   return () => {
-//     if (timeout) clearTimeout(timeout);
-//   };
-// }, [searchQuery]);
-  // console.log("Prompts loaded:", prompts);
-//   const years = useMemo(() => {
-//   const allYears = prompts.map((p) =>
-//     new Date(p.timestamp).getFullYear().toString()
-//   );
-//   return ["All Years", ...Array.from(new Set(allYears))];
-// }, [prompts]);
   
 
     console.log("Filtered prompts:", filterPrompts);
