@@ -2,79 +2,66 @@ import { supabase } from "@/lib/supabase-client";
 import { useEffect, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+type PlatformRow = { platform: string; count: number };
+type PlatformResp = { total_platforms: number; rows: PlatformRow[] };
+
 export default function BarChartComponent() {
-    // const [data, setData] = useState<{ platform: string; count: number }[]>([]);
-    const [totalPlatforms, setTotalPlatforms] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const fetchPromptsPerPlatform = async () => {
-          const {data: { user }, error: userError } = await supabase.auth.getUser();
-          if (userError || !user) {
-            console.error("No user found");
-            setLoading(false);
-            return;
-          }
+  const [platformData, setPlatformData] = useState<PlatformRow[]>([]);
+  const [totalPlatforms, setTotalPlatforms] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-          const { data, count: totalPlatforms, error } = await supabase
-            .from('prompts')
-            .select('source')
-            .eq('user_id', user.id)
-          
-    
-          console.log("Prompts per platform:", data);
-          if (error) {
-            console.error("Error fetching prompts per platform", error);
-            return [];
-          }
-          setTotalPlatforms(totalPlatforms || 0);
-    
-          const platformCount: Record<string, number> = {};
-          data.forEach((row) => {
-            if (row.source) {
-              platformCount[row.source] = (platformCount[row.source] || 0) + 1;
-            }
-          });
-          console.log("Prompts per platform:", platformCount);
-    
-          return Object.entries(platformCount).map(([platform, count]) => ({
-              platform,
-              count,
-            }));
-    
-        }
-        const [platformData, setPlatformData] = useState<{ platform: string; count: number }[]>([]);
-        useEffect(() => {
-          const loadData = async () => {
-            const platforms = await fetchPromptsPerPlatform();
-            if (platforms) {
-              setPlatformData(platforms);
-            }
-            setLoading(false);
-          };
-          loadData();
-        }, []);
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const { data: { user }, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !user) {
+        console.error("No user found");
+        setLoading(false);
+        return;
+      }
 
-        if (loading) {
-            return <div className="text-center">Loading chart...</div>;
-        }
+      const { data: rpcData, error } = await supabase.rpc(
+        "get_platform_counts_json",
+        { p_user_id: user.id }
+      );
 
+      if (error) {
+        console.error("Error fetching platform counts via RPC:", error);
+        setLoading(false);
+        return;
+      }
 
-        return (
-            <section className="mt-10 p-6 bg-white rounded-xl shadow-md">
-                <h2 className="text-2xl font-bold mb-6">Analytics</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
-                    {/* Bar Chart for Platforms */}
-                    <div className="bg-white">
-                        <h3 className="text-lg font-semibold mb-4">Prompts per Platform</h3>
-                        <ResponsiveContainer width={200} height={300}>
-                            <BarChart data={platformData}>
-                            <XAxis dataKey="platform" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="count" fill="#7C3AED" radius={[8, 8, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </section>
-        )
+      const { rows, total_platforms } = (rpcData ?? {}) as PlatformResp;
+      setPlatformData(rows ?? []);
+      setTotalPlatforms(total_platforms ?? 0);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <div className="text-center">Loading chart...</div>;
+
+  return (
+    <section className="mt-10 p-6 bg-white rounded-xl shadow-md">
+      <h2 className="text-2xl font-bold mb-6">Analytics</h2>
+
+      <div className="mb-3 text-sm text-zinc-600">
+        {/* unique platforms, not capped by 1k */}
+        {totalPlatforms} platforms
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
+        <div className="bg-white">
+          <h3 className="text-lg font-semibold mb-4">Prompts per Platform</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={platformData}>
+              <XAxis dataKey="platform" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" radius={[8, 8, 0, 0]} fill="#7C3AED" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </section>
+  );
 }
