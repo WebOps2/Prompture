@@ -108,6 +108,7 @@ export function AppSidebar() {
       <div className="px-4 py-3 border-t flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UserCircle className="w-6 h-6 text-gray-700" />
+          <> </>
           <div className="text-sm leading-tight">
             <div className="font-medium text-gray-800">{user}</div>
             <div className="text-gray-500 text-xs">{email}</div>
