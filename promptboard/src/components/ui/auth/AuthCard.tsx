@@ -156,7 +156,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
       }, "*");
     }
       // console.log("User signed in successfully");
-      router.push("/welcome-screen");
+      router.push("/panel/dashboard");
     }
   }
 

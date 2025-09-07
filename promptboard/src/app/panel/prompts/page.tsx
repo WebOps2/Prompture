@@ -23,6 +23,7 @@ type Prompt = {
   source: string;
   tags?: string[];
   title?: string;
+  favorite?: boolean;
 };
 
 export default function DashboardPage() {
@@ -57,6 +58,8 @@ export default function DashboardPage() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const promptsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
+  const [favoriteFilter, setFavoriteFilter] =
+  useState<"All" | "Favorites" | "Non-favorites">("All");
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPages = parseInt(searchParams.get("page") || "1", 10);
@@ -107,6 +110,11 @@ export default function DashboardPage() {
       const matchesSemantic =
         !semanticMode || semanticIds.includes(prompt.id);
 
+      const matchesFavorite =
+      favoriteFilter === "All" ||
+      (favoriteFilter === "Favorites" && !!prompt.favorite) ||
+      (favoriteFilter === "Non-favorites" && !prompt.favorite);
+
       return (
         matchesDay &&
         matchesMonth &&
@@ -114,7 +122,8 @@ export default function DashboardPage() {
         matchesPlatform &&
         matchesTag &&
         matchesRange &&
-        matchesSemantic
+        matchesSemantic &&
+        matchesFavorite
       );
     });
 
@@ -146,6 +155,7 @@ export default function DashboardPage() {
         month: string;
         year: string;
         range: string;
+        fav: "All" | "Favorites" | "Non-favorites";
       }) => {
         const params = new URLSearchParams();
 
@@ -155,6 +165,7 @@ export default function DashboardPage() {
         if (filters.month !== "All Months") params.set("month", filters.month);
         if (filters.year !== "All Years") params.set("year", filters.year);
         if (filters.range !== "All Time") params.set("range", filters.range);
+        if (filters.fav !== "All") params.set("fav", filters.fav);
 
         params.set("page", "1");
         router.push(`/panel/prompts?${params.toString()}`);
@@ -289,6 +300,23 @@ export default function DashboardPage() {
         setPlatforms(["All Platforms", ...uniquePlatforms]);
       }
     };
+    const deletePrompts = async (id: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      const { error } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("id", id)
+
+      if (error) {
+        console.error("Error deleting prompts:", error);
+      } else {
+        console.log("All prompts deleted");
+        setPrompts([]);
+        setHasPrompts(false);
+      }
+    };
     const fetchPrompts = async () => {
       const {
         data: { user },
@@ -410,7 +438,8 @@ export default function DashboardPage() {
       </form>
 
       {/* Filters - Now Responsive */}
-      <div className="w-full max-w-4xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
+      <div className='w-full max-w-4xl mx-auto mt-4'>
+        <div className="flex flex-col gap-3  md:flex-row md:flex-wrap md:gap-3 xl:flex-nowrap xl:overflow-x-auto">
         <Select value={selectedDay} onValueChange={(v) =>{
            setSelectedDay(v);
            updateURL({
@@ -420,7 +449,8 @@ export default function DashboardPage() {
             month: selectedMonth,
             year: selectedYear,
             range: selectedRange,
-        });; // Reset to first page on filter change
+            fav: favoriteFilter,
+        }); // Reset to first page on filter change
           }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by day" />
@@ -443,7 +473,8 @@ export default function DashboardPage() {
             month: selectedMonth,
             year: selectedYear,
             range: selectedRange,
-        });; // Reset to first page on filter change
+            fav: favoriteFilter,
+        }); // Reset to first page on filter change
         }}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by platform" />
@@ -467,6 +498,7 @@ export default function DashboardPage() {
               month: selectedMonth,
               year: selectedYear,
               range: selectedRange,
+              fav: favoriteFilter,
           });; // Reset to first page on filter change
             if (v !== "Other") setCustomTag("");
           }}>
@@ -501,6 +533,7 @@ export default function DashboardPage() {
             month: v,
             year: selectedYear,
             range: selectedRange,
+            fav: favoriteFilter,
           }); // Reset to first page on filter change
           }}>
           <SelectTrigger className="w-full">
@@ -522,6 +555,7 @@ export default function DashboardPage() {
             month: selectedMonth,
             year: v,
             range: selectedRange,
+            fav: favoriteFilter,
           });}}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by year" />
@@ -542,7 +576,9 @@ export default function DashboardPage() {
             month: selectedMonth,
             year: selectedYear,
             range: v,
-          });;}}>
+            fav: favoriteFilter,
+          });
+        }}>
           <SelectTrigger className="w-full gap-2">
             <CalendarDays className="w-4 h-4" />
             <SelectValue placeholder="All Time" />
@@ -553,7 +589,33 @@ export default function DashboardPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select
+        value={favoriteFilter}
+        onValueChange={(v: "All" | "Favorites" | "Non-favorites") => {
+          setFavoriteFilter(v);
+          updateURL({
+            day: selectedDay,
+            platform: selectedPlatform,
+            tag: selectedTag === "Other" ? customTag : selectedTag,
+            month: selectedMonth,
+            year: selectedYear,
+            range: selectedRange,
+            fav: v, // 👈 include
+          });
+        }}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Favorites" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="All">All</SelectItem>
+          <SelectItem value="Favorites">Favorites</SelectItem>
+          <SelectItem value="Non-favorites">Non-favorites</SelectItem>
+        </SelectContent>
+      </Select>
       </div>
+      </div>
+      
 
       {/* Prompt Count */}
       <p className="mt-4">
