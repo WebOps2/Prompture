@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
+import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2, X } from "lucide-react";
 
 import { supabase } from '@/lib/supabase-client'; // Adjust the import based on your project structure
 import { useEffect, useState } from "react";
@@ -63,6 +63,23 @@ export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: ()
         console.log("✅ Prompt updated!");
         setLocalPrompt(editedPrompt);   // update what displays
         setIsEditing(false);
+      }
+    };
+
+    const handleRemoveTag = async (tag: string) => {
+      // optimistic update
+      const updated = localTags.filter((t) => t !== tag);
+      setLocalTags(updated);
+
+      const { error } = await supabase
+        .from("prompts")
+        .update({ tags: updated })
+        .eq("id", prompt.id);
+
+      if (error) {
+        console.error("❌ Failed to remove tag:", error);
+        // rollback if needed
+        setLocalTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
       }
     };
     const handleAddTag = async () => {
@@ -271,9 +288,26 @@ export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: ()
         {localTags.map((tag) => (
           <span
             key={tag}
-            className="px-3 py-1 text-xs rounded-full border border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-white"
+            className="px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-white flex items-center gap-0.5 text-sm"
           >
             {tag}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveTag(tag);
+              }}
+              className="
+                ml-1 rounded-full p-0.5
+                opacity-0 group-hover:opacity-100 focus:opacity-100
+                transition-opacity
+                hover:bg-zinc-200/60 dark:hover:bg-zinc-700
+              "
+              aria-label={`Remove tag ${tag}`}
+              title="Remove tag"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </span>
         ))}
       </div>
