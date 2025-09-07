@@ -289,7 +289,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Recent Favorites</h2>
           <a
-            href="/panel/prompts?filter=favorites"
+            href="/panel/prompts?fav=Favorites&page=1"
             className="text-purple-600 hover:underline text-sm font-medium"
           >
             View All →
