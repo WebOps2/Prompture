@@ -24,7 +24,7 @@ type Prompt = {
   favorite?: boolean;
 };
 
-export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
+export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: () => void; }) => {
     const getPromptFontSize = (text: string) => {
     const wordCount = text.trim().split(/\s+/).length;
 
@@ -99,6 +99,7 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
         setFavorited(newValue);
       }
     };
+  
     
     useEffect(() => {
     const updateLength = () => {
@@ -167,7 +168,12 @@ export const PromptCard = ({ prompt }: { prompt: Prompt }) => {
                 <Star className={`w-4 h-4 ${favorited ? "fill-yellow-400" : "hover:text-yellow-400"}`} onClick={toggleFavorite}/>
                 Add to Favorites
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
+                <DropdownMenuItem 
+                className="gap-2 text-red-600 focus:text-red-600"
+                onClick={(e) => {
+                e.preventDefault();
+                onDelete?.();
+              }}>
                 <Trash2 className="w-4 h-4" />
                 Delete
                 </DropdownMenuItem>

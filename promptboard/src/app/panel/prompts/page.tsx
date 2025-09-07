@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase-client';
-import { CalendarDays, Loader2 } from "lucide-react";
+import { CalendarDays, Loader2, Star } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from 'react';
 
@@ -201,6 +201,34 @@ export default function DashboardPage() {
       setSearchQuery(""); // Clear search query after search
     };
 
+    const handleDeletePrompt = async (id: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);      // keep it safe with RLS
+
+      if (error) {
+        console.error("❌ Delete failed:", error);
+        return;
+      }
+
+      // remove from UI immediately
+      setPrompts(prev => prev.filter(p => p.id !== id));
+
+      // keep counts/pagination sane
+      const remaining = filterPrompts.length - 1;
+      setHasPrompts(remaining > 0);
+      if (remaining === 0 && currentPages > 1) {
+        handlePageChange(currentPages - 1);
+      } else {
+        setTotalPages(Math.max(1, Math.ceil(remaining / promptsPerPage)));
+      }
+    };
+
   useEffect(() => {
     
     const fetchAllPrompts = async () => {
@@ -300,23 +328,7 @@ export default function DashboardPage() {
         setPlatforms(["All Platforms", ...uniquePlatforms]);
       }
     };
-    const deletePrompts = async (id: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) return;
-      const { error } = await supabase
-        .from("prompts")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("id", id)
-
-      if (error) {
-        console.error("Error deleting prompts:", error);
-      } else {
-        console.log("All prompts deleted");
-        setPrompts([]);
-        setHasPrompts(false);
-      }
-    };
+    
     const fetchPrompts = async () => {
       const {
         data: { user },
@@ -590,21 +602,22 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
         <Select
-        value={favoriteFilter}
-        onValueChange={(v: "All" | "Favorites" | "Non-favorites") => {
-          setFavoriteFilter(v);
-          updateURL({
-            day: selectedDay,
-            platform: selectedPlatform,
-            tag: selectedTag === "Other" ? customTag : selectedTag,
-            month: selectedMonth,
-            year: selectedYear,
-            range: selectedRange,
-            fav: v, // 👈 include
-          });
-        }}
+          value={favoriteFilter}
+          onValueChange={(v: "All" | "Favorites" | "Non-favorites") => {
+            setFavoriteFilter(v);
+            updateURL({
+              day: selectedDay,
+              platform: selectedPlatform,
+              tag: selectedTag === "Other" ? customTag : selectedTag,
+              month: selectedMonth,
+              year: selectedYear,
+              range: selectedRange,
+              fav: v, // 👈 include
+            });
+          }}
       >
         <SelectTrigger className="w-full">
+          <Star className="w-4 h-4" />
           <SelectValue placeholder="Favorites" />
         </SelectTrigger>
         <SelectContent>
@@ -628,7 +641,7 @@ export default function DashboardPage() {
           </p>
         ) : paginatedPrompts.length > 0 ? (
           paginatedPrompts.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} />
+            <PromptCard key={prompt.id} prompt={prompt} onDelete={() => handleDeletePrompt(prompt.id)} />
           ))
         ) : (
          <>
