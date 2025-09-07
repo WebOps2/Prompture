@@ -24,6 +24,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [signedUp, setSignedUp] = useState(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -118,6 +119,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
     } 
     else {
       console.log("Signing user up:", { email, fullName });
+      setSignedUp(true);
     }
 
   } else {
@@ -239,6 +241,9 @@ export default function AuthCard({ mode }: AuthCardProps) {
           {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
         </Button>
         </form>
+        {signedUp && mode === "signup" && (
+          <p className="text-sm text-green-500 text-center">Signup successful! Please check your email to verify your account.</p>
+        )}
         
       </div>
     </motion.div>
