@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { CalendarDays, Copy, Eye, FilePlus2, MoreHorizontal, Pencil, Star, Trash2, X } from "lucide-react";
+import { CalendarDays, Copy, Eye, MoreHorizontal, Pencil, Star, Trash2, X } from "lucide-react";
 
 import { supabase } from '@/lib/supabase-client'; // Adjust the import based on your project structure
 import { useEffect, useState } from "react";
@@ -161,10 +161,6 @@ export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: ()
                 <DropdownMenuItem className="gap-2" onClick={() => setIsEditing(true)}>
                 <Pencil className="w-4 h-4" />
                 Edit Prompt
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                <FilePlus2 className="w-4 h-4" />
-                Duplicate
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                 className="gap-2"
