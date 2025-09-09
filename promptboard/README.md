@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prompture  
 
-## Getting Started
+**Your personal AI prompt library — save, organize, and improve prompts across multiple AI platforms.**  
 
-First, run the development server:
+PromptBoard is a **Next.js web app + Chrome Extension** that helps users capture prompts from AI tools (ChatGPT, Claude, Poe, etc.), organize them with tags and filters, and analyze their effectiveness.  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Universal Prompt Capture**  
+  Chrome extension detects when you send prompts to AI platforms and saves them automatically.  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Organize & Search**  
+  - Tag, favorite, and archive prompts  
+  - Filter by day, month, year, or platform  
+  - Fast semantic search powered by OpenAI embeddings + vector DB  
 
-## Learn More
+- **Smart Analytics**  
+  - Dashboard with usage statistics, charts, and filters  
+  - Auto-generated titles for prompts  
+  - Prompt improvement pipeline: ML model evaluates → GPT rewrites → re-scored for quality  
 
-To learn more about Next.js, take a look at the following resources:
+- **Secure & Scalable**  
+  - Supabase backend with Row Level Security  
+  - Edge Functions for secure prompt insertion  
+  - Real-time syncing between extension and web app  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack  
 
-## Deploy on Vercel
+- **Frontend:** Next.js, React, TailwindCSS, ShadCN UI, Framer Motion  
+- **Backend:** Supabase (Postgres, Vector Search, Auth, Edge Functions)  
+- **ML Layer:** OpenAI embeddings + custom scoring model  
+- **Extension:** Chrome Extension
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📊 Dashboard Preview  
+
+- Save and browse prompts with responsive PromptCards  
+- Filter by tags, favorites, day/month/year  
+- Paginated views with smooth navigation  
+- Semantic search and smart suggestions  
+
+---
+
+## 🌟 My Role  
+
+- **Led full-stack development** from initial schema design to Chrome extension integration  
+- **Implemented Supabase Edge Functions** for secure prompt storage without exposing keys  
+- **Engineered semantic search** using embeddings + vector DB for relevant results  
+- **Built Chrome extension** to universally capture prompts across AI tools  
+- **Designed UI/UX** with Tailwind, ShadCN, and custom animations for a polished experience  
+
+---
+
+## 📌 Status  
+
+- 🔹 **MVP Complete** — prompts saving, tagging, filtering, search, and dashboard working  
+- 🔹 **In Progress** — ML-powered prompt scoring and improvement pipeline  
+- 🔹 **Coming Soon** — team features, collaboration, and advanced analytics  
+
+---
