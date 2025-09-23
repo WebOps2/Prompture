@@ -33,7 +33,7 @@ Prompture is a **Next.js web app + Chrome Extension** that helps users capture p
 - **Frontend:** Next.js, React, TailwindCSS, ShadCN UI, Framer Motion  
 - **Backend:** Supabase (Postgres, Vector Search, Auth, Edge Functions)  
 - **ML Layer:** OpenAI embeddings + custom scoring model  
-- **Extension:** Chrome Extension (TypeScript, DOM listeners, `window.postMessage`)  
+- **Extension:** Chrome Extension (JavaScript)  
 
 ---
 
