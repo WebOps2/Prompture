@@ -83,7 +83,7 @@ if (!window.location.hostname.includes("prompt-board")) {
 let latestPrompt = "";
 const site = window.location.hostname;
 const selector = selectors[site] || selectors["https://chatgpt.com/*"];
-const timestamp = new Date().toISOString();
+// const timestamp = new Date().toISOString();
 
 
 // 👇 This tracks user input into ChatGPT's editable div
