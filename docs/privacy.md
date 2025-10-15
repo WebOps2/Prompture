@@ -35,9 +35,9 @@ All executable code is packaged with the extension. We fetch **data only** (e.g.
 ## Retention & deletion
 - Data is retained while your account is active.
 - Remove local data by uninstalling the extension or clearing Extension Storage.
-- To delete server-side data (account + library), email **support@prompture.org**; we’ll confirm and delete within 30 days.
+- To delete server-side data (account + library), email **kosi.amobioleka@gmail.com**; we’ll confirm and delete within 30 days.
 
 ## Your rights & contact
-You may request access, correction, export, or deletion of your data. Contact **support@prompture.org**.
+You may request access, correction, export, or deletion of your data. Contact **kosi.amobioleka@gmail.com**.
 
 *We may update this policy and will post changes here with a new effective date.*
