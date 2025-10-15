@@ -6,9 +6,10 @@ import {
   FileText,
   LayoutDashboard,
   LogOut,
+  Shield,
   Trash2,
   User,
-  UserCircle,
+  UserCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -63,6 +64,11 @@ export function AppSidebar() {
       href: "/panel/account",
       icon: User,
     },
+    {
+      title: "Privazy",
+      href: "/panel/privacy",
+      icon: Shield,
+    }
   ];
 
   const handleLogout = async () => {
