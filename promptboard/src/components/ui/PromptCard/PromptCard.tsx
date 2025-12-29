@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { CalendarDays, Copy, Eye, MoreHorizontal, Pencil, Star, Trash2, X } from "lucide-react";
+import { CalendarDays, Copy, MoreHorizontal, Pencil, Star, Trash2, X } from "lucide-react";
 
 import { supabase } from '@/lib/supabase-client'; // Adjust the import based on your project structure
 import { useEffect, useState } from "react";
@@ -145,11 +145,11 @@ export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: ()
   return (
     <div className="relative group border rounded-2xl bg-white dark:bg-zinc-900 p-5 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md duration-200 ease-out ">
       {/* View / More Icons */}
-      <div className="absolute top-4 right-4 flex items-center gap-4 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="absolute top-4 right-4 flex items-center gap-4  transition-opacity duration-200">
+        {/* <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
           <Eye className="w-4 h-4" />
           <span className="text-sm">View</span>
-        </div>
+        </div> */}
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button className="text-zinc-500 hover:text-zinc-700 dark:hover:text-white">
