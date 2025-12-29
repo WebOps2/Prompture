@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-promptboard/node_modules/
+/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -14,7 +14,7 @@ promptboard/node_modules/
 /coverage
 
 # next.js
-promptboard/.next/
+/.next/
 /out/
 
 # production
@@ -31,8 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-promptboard/.env
-promptboard/.env.local
+.env*
 
 # vercel
 .vercel
