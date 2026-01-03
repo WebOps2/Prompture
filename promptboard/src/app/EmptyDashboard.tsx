@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { BookOpen, Chrome, Sparkles, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 
 export default function EmptyDashBoard() {
+  const link = "https://chromewebstore.google.com/detail/promptboard/cciapdgmelahbmnjomlbdmpbejedmnkm?authuser=0&hl=en&pli=1"
   return (
     <motion.div 
     initial={{ opacity: 0, y: 20 }}
@@ -68,10 +70,10 @@ export default function EmptyDashBoard() {
         <p className="text-gray-600">You haven&rsquo;t saved any prompts yet.</p>
 
         <div className="flex justify-center">
-          <button className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
+          <Link href={link} className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:opacity-90 transition">
             <Chrome className="w-5 h-5" />
             Install Chrome Extension
-          </button>
+          </Link>
         </div>
 
         <p className="text-gray-600">

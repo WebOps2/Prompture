@@ -362,3 +362,5 @@ export const PromptCard = ({ prompt, onDelete }: { prompt: Prompt; onDelete?: ()
     </div>
   );
 };
+
+// I am a dumbass
