@@ -4,13 +4,14 @@ import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import useUser from "@/hooks/use-user";
 import { supabase } from "@/lib/supabase-client";
-import { Moon } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const { user} = useUser();
   const AUTO_LOGOUT_MS = 60 * 60 * 1000  
 
@@ -56,6 +57,46 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   }, []);
 
+  // Dark mode initialization and sync
+  useEffect(() => {
+    // Check initial theme from localStorage or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    
+    setIsDark(shouldBeDark);
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Watch for changes (in case theme is changed elsewhere)
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDark;
+    setIsDark(newDarkMode);
+    
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
   if (!checked) return null; // Or a loading spinner
   // if (loading) return null; // Or a loading spinner
 
@@ -80,9 +121,17 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
-            {/* Right: Moon icon, vertically aligned */}
-            <button className="text-muted-foreground hover:text-foreground">
-              <Moon className="w-5 h-5" />
+            {/* Right: Moon/Sun icon, vertically aligned */}
+            <button 
+              onClick={toggleDarkMode}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
             </button>
           </div>
 
